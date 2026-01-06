@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 import os
-import calendar # Necesario para calcular los días de cada mes
 
 # --- CONFIGURACIÓN PÁGINA ---
 st.set_page_config(
@@ -14,11 +13,10 @@ st.set_page_config(
 )
 
 # --- TRADUCCIÓN FORZADA (Diccionarios) ---
-MESES_ES_LISTA = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
-                  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-# Mapeo inverso para guardar en base de datos
-MESES_ES_DICT = {nombre: i+1 for i, nombre in enumerate(MESES_ES_LISTA)}
-MESES_NUM_DICT = {i+1: nombre for i, nombre in enumerate(MESES_ES_LISTA)}
+MESES_ES_DICT = {
+    1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 5: "Mayo", 6: "Junio",
+    7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
+}
 
 # --- ARCHIVOS ---
 FILE_NAME = "finanzas.csv"
@@ -56,10 +54,11 @@ def save_categories(lista):
     pd.DataFrame({"Categoría": lista}).to_csv(CAT_FILE_NAME, index=False)
 
 def formatear_periodo_es(fecha_dt):
+    """Fuerza el nombre del mes en Castellano para gráficos"""
     if isinstance(fecha_dt, str):
         try: fecha_dt = datetime.strptime(fecha_dt, "%Y-%m")
         except: return fecha_dt
-    nombre_mes = MESES_NUM_DICT[fecha_dt.month]
+    nombre_mes = MESES_ES_DICT[fecha_dt.month]
     return f"{nombre_mes} {fecha_dt.year}"
 
 # --- ESTADO SESIÓN ---
@@ -70,7 +69,7 @@ if 'simulacion' not in st.session_state:
 df = load_data()
 lista_cats = load_categories()
 
-# --- SIDEBAR: REGISTRO CON FECHA EN CASTELLANO FORZADO ---
+# --- SIDEBAR: REGISTRO (CON CALENDARIO) ---
 st.sidebar.header("📝 Gestión de Movimientos")
 modo_simulacion = st.sidebar.checkbox("🧪 Modo Simulación", help="Prueba gastos sin guardar")
 
@@ -80,34 +79,10 @@ st.sidebar.markdown(f":{color_estado}[**ESTADO: {'SIMULANDO' if modo_simulacion 
 with st.sidebar.form("form_reg", clear_on_submit=not modo_simulacion):
     tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
     
-    # --- SELECTOR DE FECHA PERSONALIZADO (FUERZA CASTELLANO) ---
-    st.write("Fecha:")
-    col_d, col_m, col_y = st.columns([1, 2, 1.5])
+    # --- VOLVEMOS AL CALENDARIO ---
+    # format="DD/MM/YYYY" ayuda a que el móvil entienda el formato europeo
+    fecha = st.date_input("Fecha", datetime.now(), format="DD/MM/YYYY")
     
-    hoy = datetime.now()
-    
-    with col_y:
-        # Años: del actual hacia atrás y adelante
-        anos = list(range(hoy.year - 5, hoy.year + 6))
-        anio_sel = st.selectbox("Año", anos, index=anos.index(hoy.year), label_visibility="collapsed")
-    
-    with col_m:
-        # Meses: Siempre en Español
-        mes_sel_nombre = st.selectbox("Mes", MESES_ES_LISTA, index=hoy.month - 1, label_visibility="collapsed")
-        mes_sel_num = MESES_ES_DICT[mes_sel_nombre]
-    
-    with col_d:
-        # Días: Calculamos cuántos días tiene el mes/año seleccionado (ej. bisiestos)
-        _, num_dias = calendar.monthrange(anio_sel, mes_sel_num)
-        dias = list(range(1, num_dias + 1))
-        # Intentamos mantener el día actual, si no existe (ej: 31 feb), ponemos el último posible
-        idx_dia = hoy.day - 1 if hoy.day <= num_dias else num_dias - 1
-        dia_sel = st.selectbox("Día", dias, index=idx_dia, label_visibility="collapsed")
-    
-    # Reconstruimos la fecha
-    fecha_construida = datetime(anio_sel, mes_sel_num, dia_sel)
-    # -------------------------------------------------------------
-
     cat = st.selectbox("Categoría", lista_cats)
     con = st.text_input("Concepto")
     imp = st.number_input("Importe (€)", min_value=0.0, step=10.0, format="%.2f")
@@ -118,13 +93,15 @@ with st.sidebar.form("form_reg", clear_on_submit=not modo_simulacion):
     if st.form_submit_button(btn_txt, use_container_width=True):
         if imp > 0 and con:
             impacto = imp / 12 if fre == "Anual" else imp
+            # Convertimos la fecha del calendario a datetime seguro
+            fecha_dt = pd.to_datetime(fecha)
+            
             if modo_simulacion:
                 st.session_state.simulacion = {"Concepto": con, "Importe": imp, "Impacto_Mensual": impacto, "Tipo": tipo}
                 st.success("Simulando...")
-                # Forzamos recarga para que se note en la UI
                 st.rerun() 
             else:
-                new_row = pd.DataFrame([[fecha_construida, tipo, cat, con, imp, fre, impacto]], columns=COLUMNS)
+                new_row = pd.DataFrame([[fecha_dt, tipo, cat, con, imp, fre, impacto]], columns=COLUMNS)
                 df = pd.concat([df, new_row], ignore_index=True)
                 save_all_data(df)
                 st.session_state.simulacion = None
@@ -180,11 +157,12 @@ else:
             else:
                 st.info("Activa el modo simulación en la barra lateral.")
 
-    # 2. GRÁFICOS
+    # 2. GRÁFICOS (EJE X SIEMPRE EN ESPAÑOL)
     with tab2:
         st.subheader("Evolución Mensual")
         df_ev = df.groupby([df['Fecha'].dt.to_period('M'), 'Tipo'])['Importe'].sum().reset_index()
         df_ev['Fecha_dt'] = df_ev['Fecha'].dt.to_timestamp()
+        # Aquí forzamos la traducción independientemente del calendario usado
         df_ev['Mes_Castellano'] = df_ev['Fecha_dt'].apply(formatear_periodo_es)
         df_ev = df_ev.sort_values("Fecha")
 
@@ -199,6 +177,7 @@ else:
 
     # 4. EDITAR
     with tab4:
+        # El data editor también usa un calendario, configurado al formato europeo
         edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True,
                                    column_config={"Fecha": st.column_config.DateColumn("Fecha", format="DD/MM/YYYY")})
         if st.button("Guardar Cambios Tabla", use_container_width=True):
