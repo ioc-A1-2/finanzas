@@ -195,47 +195,76 @@ with st.sidebar:
     
     st.markdown("---")
     
+    # Inicializar estado de plantilla si no existe
+    if 'template_cat' not in st.session_state:
+        st.session_state.template_cat = None
+    if 'template_tipo' not in st.session_state:
+        st.session_state.template_tipo = None
+    
+    # Plantillas rápidas (FUERA del formulario)
+    st.markdown("**⚡ Plantillas Rápidas:**")
+    col_template1, col_template2 = st.columns(2)
+    with col_template1:
+        if st.button("🏠 Vivienda", use_container_width=True, key="tpl_vivienda"):
+            st.session_state.template_cat = "Vivienda"
+            st.session_state.template_tipo = "Gasto"
+            st.rerun()
+    with col_template2:
+        if st.button("🍔 Comida", use_container_width=True, key="tpl_comida"):
+            st.session_state.template_cat = "Comida"
+            st.session_state.template_tipo = "Gasto"
+            st.rerun()
+    
     # FORMULARIO MEJORADO
     with st.form("form_reg", clear_on_submit=True):
         st.subheader("➕ Nuevo Movimiento")
         
-        tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
+        # Aplicar plantilla si existe
+        tipo_index = 0 if st.session_state.template_tipo == "Ingreso" else 1
+        if st.session_state.template_tipo:
+            st.session_state.template_tipo = None  # Limpiar después de usar
         
-        # Plantillas rápidas
-        st.markdown("**⚡ Plantillas Rápidas:**")
-        col_template1, col_template2 = st.columns(2)
-        with col_template1:
-            if st.form_submit_button("🏠 Vivienda", use_container_width=True, key="tpl1"):
-                st.session_state.template = {"cat": "Vivienda", "tipo": "Gasto"}
-        with col_template2:
-            if st.form_submit_button("🍔 Comida", use_container_width=True, key="tpl2"):
-                st.session_state.template = {"cat": "Comida", "tipo": "Gasto"}
+        tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=tipo_index, horizontal=True)
         
         es_conjunto = st.checkbox("👥 Gasto Conjunto (Dividido / 2)")
         
         fecha = st.date_input("Fecha", datetime.now(), format="DD/MM/YYYY")
         
-        cat = st.selectbox("Categoría", lista_cats, key="cat_select")
+        # Aplicar categoría de plantilla si existe
+        cat_index = 0
+        if st.session_state.template_cat and st.session_state.template_cat in lista_cats:
+            cat_index = lista_cats.index(st.session_state.template_cat)
+            st.session_state.template_cat = None  # Limpiar después de usar
+        
+        cat = st.selectbox("Categoría", lista_cats, index=cat_index, key="cat_select")
         
         # Autocompletado de conceptos
         conceptos_sugeridos = get_unique_concepts(df, cat)
         concepto_input = st.text_input(
             "Concepto",
-            help="Escribe un nuevo concepto o selecciona uno sugerido",
-            key="concepto_input"
+            help="Escribe un nuevo concepto o busca en las sugerencias",
+            key="concepto_input",
+            value=""
         )
         
-        if conceptos_sugeridos and concepto_input:
-            matches = [c for c in conceptos_sugeridos if concepto_input.lower() in c.lower()]
-            if matches:
-                with st.expander("💡 Conceptos sugeridos", expanded=False):
-                    selected_concept = st.radio(
-                        "Selecciona o continúa escribiendo:",
-                        matches,
-                        key="concept_suggest"
-                    )
-                    if selected_concept:
-                        concepto_input = selected_concept
+        # Mostrar sugerencias en un expander mejorado
+        if conceptos_sugeridos and len(conceptos_sugeridos) > 0:
+            with st.expander("💡 Conceptos sugeridos para esta categoría", expanded=False):
+                # Filtrar conceptos basado en lo que el usuario escribe
+                if concepto_input:
+                    matches = [c for c in conceptos_sugeridos if concepto_input.lower() in c.lower()]
+                    if matches:
+                        st.caption(f"Se encontraron {len(matches)} coincidencias:")
+                        for concepto in matches[:5]:  # Mostrar máximo 5 coincidencias
+                            if st.button(f"📌 {concepto}", key=f"sel_{concepto}", use_container_width=True):
+                                st.session_state.concepto_input = concepto
+                                st.rerun()
+                else:
+                    st.caption(f"Conceptos usados anteriormente en '{cat}' ({len(conceptos_sugeridos)}):")
+                    for concepto in conceptos_sugeridos[:8]:  # Mostrar máximo 8
+                        if st.button(f"📌 {concepto}", key=f"sel_{concepto}", use_container_width=True):
+                            st.session_state.concepto_input = concepto
+                            st.rerun()
         
         imp_input = st.number_input(
             "Importe Total (€)", 
