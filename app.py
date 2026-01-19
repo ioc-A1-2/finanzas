@@ -59,11 +59,46 @@ def get_google_sheet():
             # Parsear credenciales desde JSON string
             # Si viene como string, intentar parsearlo
             if isinstance(GOOGLE_CREDENTIALS_JSON, str):
-                # Reemplazar \\n por \n real si es necesario
-                json_str = GOOGLE_CREDENTIALS_JSON.replace('\\n', '\n')
+                json_str = GOOGLE_CREDENTIALS_JSON
+                
+                # Si el JSON tiene saltos de línea reales (de triple comillas en TOML),
+                # necesitamos reemplazarlos por \n escapados correctamente
+                # JSON no permite saltos de línea reales en strings, deben ser \n
+                if '\n' in json_str and not '\\n' in json_str.replace('\n', '', 1):
+                    # Si tiene saltos de línea reales, convertirlos a \n escapados
+                    import re
+                    # Reemplazar saltos de línea dentro de valores de strings JSON
+                    # Necesitamos preservar los saltos de línea dentro de las comillas
+                    # Primero normalizar
+                    json_str = json_str.replace('\r\n', '\n').replace('\r', '\n')
+                    # Eliminar saltos de línea fuera de strings (entre propiedades)
+                    # Pero preservar \n dentro de los valores de strings
+                    lines = json_str.split('\n')
+                    cleaned_lines = []
+                    in_string = False
+                    escape_next = False
+                    
+                    for line in lines:
+                        cleaned_line = line.strip()
+                        if cleaned_line.startswith('"') or cleaned_line.startswith("'"):
+                            # Determinar si estamos dentro de un string
+                            quote_char = cleaned_line[0]
+                            in_string = cleaned_line.count(quote_char) % 2 != 0
+                        
+                        if in_string and not cleaned_line.startswith('"') and not cleaned_line.startswith("'"):
+                            # Dentro de un string, agregar \n antes
+                            cleaned_lines.append('\\n' + cleaned_line)
+                        else:
+                            cleaned_lines.append(cleaned_line)
+                    
+                    # Mejor enfoque: reemplazar saltos de línea por \n escapado
+                    json_str = json_str.replace('\n', '\\n')
+                
+                # Ahora parsear el JSON
                 creds_dict = json.loads(json_str)
             else:
                 creds_dict = GOOGLE_CREDENTIALS_JSON
+            
             scopes = [
                 'https://www.googleapis.com/auth/spreadsheets',
                 'https://www.googleapis.com/auth/drive'
