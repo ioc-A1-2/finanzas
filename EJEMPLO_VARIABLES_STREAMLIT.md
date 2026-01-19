@@ -104,40 +104,58 @@ GOOGLE_CREDENTIALS_JSON
 
 1. Ve a tu aplicación en [Streamlit Cloud](https://share.streamlit.io/)
 2. Haz clic en los **3 puntos** (⋮) junto a tu app o en **"Manage app"**
-3. Ve a la pestaña **"Secrets"** o **"Settings"**
-4. Busca la sección **"Secrets"** o **"Environment variables"**
-5. Haz clic en **"Edit"** o **"Add secret"**
+3. Ve a la pestaña **"Settings"** o **"Secrets"**
+4. Busca la sección **"Secrets"** 
+5. Haz clic en **"Edit secrets"** o el icono de editar ✏️
+6. Verás un editor TOML donde debes pegar el formato correcto
 
-### Para cada variable:
+### Formato TOML Correcto:
 
 **Opción A: Si usas "Secrets" (archivo .toml):**
-Agrega esto al editor de secrets:
+
+Streamlit Cloud usa un archivo TOML. Agrega esto al editor de secrets:
+
 ```toml
 GOOGLE_SHEETS_ENABLED = "true"
-GOOGLE_SHEET_ID = "tu_id_aqui"
-GOOGLE_CREDENTIALS_JSON = """
+GOOGLE_SHEET_ID = "tu_id_de_la_hoja_aqui"
+
+GOOGLE_CREDENTIALS_JSON = '''
 {
   "type": "service_account",
-  "project_id": "...",
-  ... (resto del JSON)
+  "project_id": "tu-proyecto-123456",
+  "private_key_id": "abc123def456ghi789",
+  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQD...\\n(todas las lineas de la clave privada)\\n-----END PRIVATE KEY-----\\n",
+  "client_email": "nombre-cuenta@tu-proyecto-123456.iam.gserviceaccount.com",
+  "client_id": "123456789012345678901",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nombre-cuenta%40tu-proyecto-123456.iam.gserviceaccount.com"
 }
-"""
+'''
 ```
 
-**Opción B: Si usas "Environment variables" (variables individuales):**
+**⚠️ IMPORTANTE para TOML:**
+- Usa comillas simples triples `'''` para la cadena multilínea JSON
+- Los saltos de línea en la clave privada deben estar como `\\n` (doble barra invertida)
+- O puedes usar el JSON en una sola línea sin saltos
 
-Agrega 3 variables separadas:
-- Variable 1:
-  - Key: `GOOGLE_SHEETS_ENABLED`
-  - Value: `true`
+**Formato alternativo (más fácil): Todo en una línea:**
+```toml
+GOOGLE_SHEETS_ENABLED = "true"
+GOOGLE_SHEET_ID = "tu_id_de_la_hoja_aqui"
+GOOGLE_CREDENTIALS_JSON = '{"type":"service_account","project_id":"tu-proyecto-123456","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\\n...\\n-----END PRIVATE KEY-----\\n","client_email":"cuenta@proyecto.iam.gserviceaccount.com","client_id":"123456","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/cuenta%40proyecto.iam.gserviceaccount.com"}'
+```
 
-- Variable 2:
-  - Key: `GOOGLE_SHEET_ID`
-  - Value: `tu_id_de_la_hoja` (sin comillas)
+**Ejemplo completo de secrets.toml (copiar y pegar):**
 
-- Variable 3:
-  - Key: `GOOGLE_CREDENTIALS_JSON`
-  - Value: (pega TODO el contenido del JSON, incluyendo `{` y `}`)
+```toml
+GOOGLE_SHEETS_ENABLED = "true"
+GOOGLE_SHEET_ID = "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t"
+GOOGLE_CREDENTIALS_JSON = '{"type":"service_account","project_id":"tu-proyecto","private_key_id":"abc123","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIE...\\n-----END PRIVATE KEY-----\\n","client_email":"cuenta@proyecto.iam.gserviceaccount.com","client_id":"123456","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/cuenta%40proyecto.iam.gserviceaccount.com"}'
+```
+
+**📁 Ver también:** He creado un archivo `secrets.toml.ejemplo` en el repositorio con un formato completo y comentado.
 
 ---
 
