@@ -225,7 +225,6 @@ def load_categories():
     return default
 
 def save_categories(lista):
-<<<<<<< HEAD
     """Guarda categorías en Google Sheets o archivo local"""
     lista = list(dict.fromkeys(lista))
     
@@ -244,8 +243,8 @@ def save_categories(lista):
             except Exception as e:
                 st.warning(f"Error guardando categorías en Google Sheets: {str(e)}")
     
-    lista = list(dict.fromkeys(lista))
     pd.DataFrame({"Categoría": lista}).to_csv(CAT_FILE_NAME, index=False)
+    st.cache_data.clear()
 
 def formatear_periodo_es(fecha_dt):
     if isinstance(fecha_dt, str):
@@ -332,8 +331,8 @@ else:
     total_conjunto = df[df['Es_Conjunto'] == True]['Importe'].sum()
 
     # PESTAÑAS
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-        ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "⚙️ Config"]
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+        ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar", "⚙️ Config"]
     )
 
     # --- TAB 1: ASESOR & SIMULACIÓN (RESTAURADO) ---
@@ -435,14 +434,13 @@ else:
             save_all_data(edited_df); st.rerun()
 
     with tab6:
-<<<<<<< HEAD
         st.subheader("📤 Exportar Datos")
         
         col_exp1, col_exp2 = st.columns(2)
         
         with col_exp1:
             st.markdown("**Exportar como CSV**")
-            csv = df_filtrado.to_csv(index=False).encode('utf-8-sig')
+            csv = df.to_csv(index=False).encode('utf-8-sig')
             st.download_button(
                 label="📥 Descargar CSV",
                 data=csv,
@@ -454,7 +452,11 @@ else:
         with col_exp2:
             st.markdown("**Exportar como Excel**")
             try:
-                excel_data = export_to_excel(df_filtrado)
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    df.to_excel(writer, index=False, sheet_name='Finanzas')
+                output.seek(0)
+                excel_data = output.getvalue()
                 st.download_button(
                     label="📊 Descargar Excel",
                     data=excel_data,
@@ -468,7 +470,7 @@ else:
         
         st.markdown("---")
         st.markdown("**📋 Resumen de Datos Exportados**")
-        st.info(f"Se exportarán {len(df_filtrado)} registros filtrados.")
+        st.info(f"Se exportarán {len(df)} registros.")
     
     # --- TAB 7: CONFIGURACIÓN MEJORADA ---
     with tab7:
