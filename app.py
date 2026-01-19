@@ -57,7 +57,13 @@ def get_google_sheet():
     try:
         if GOOGLE_CREDENTIALS_JSON and GOOGLE_SHEET_ID:
             # Parsear credenciales desde JSON string
-            creds_dict = json.loads(GOOGLE_CREDENTIALS_JSON)
+            # Si viene como string, intentar parsearlo
+            if isinstance(GOOGLE_CREDENTIALS_JSON, str):
+                # Reemplazar \\n por \n real si es necesario
+                json_str = GOOGLE_CREDENTIALS_JSON.replace('\\n', '\n')
+                creds_dict = json.loads(json_str)
+            else:
+                creds_dict = GOOGLE_CREDENTIALS_JSON
             scopes = [
                 'https://www.googleapis.com/auth/spreadsheets',
                 'https://www.googleapis.com/auth/drive'
