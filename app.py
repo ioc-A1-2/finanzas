@@ -1596,9 +1596,6 @@ if st.session_state.show_modal:
         st.rerun()
 
 # --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
-if 'menu_abierto' not in st.session_state:
-    st.session_state.menu_abierto = False
-
 col_header_left, col_header_center, col_header_right = st.columns([3, 1, 1])
 with col_header_left:
     # Título dinámico según sección
@@ -1627,56 +1624,19 @@ with col_header_right:
         st.session_state.menu_abierto = not st.session_state.menu_abierto
         st.rerun()
 
-# Menú lateral izquierdo
-if st.session_state.menu_abierto:
-    # Overlay y menú lateral con CSS
-    st.markdown("""
-    <style>
-    .side-menu-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 99998;
-    }
-    .side-menu-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 280px;
-        height: 100%;
-        background: var(--background-color);
-        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-        z-index: 99999;
-        padding: 1rem;
-        overflow-y: auto;
-    }
-    </style>
-    <div class="side-menu-overlay"></div>
-    <div class="side-menu-container">
-    """, unsafe_allow_html=True)
-    
-    opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
-    
-    st.markdown("### Navegación")
-    
-    # Botón para cerrar menú
-    if st.button("✕ Cerrar", use_container_width=True, key="btn_cerrar_menu"):
-        st.session_state.menu_abierto = False
-        st.rerun()
-    
-    st.markdown("---")
-    
-    # Botones del menú
-    for opcion in opciones_menu:
-        if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
-            st.session_state.seccion_actual = opcion
-            st.session_state.menu_abierto = False
-            st.rerun()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+# Menú lateral usando popover de Streamlit (más robusto)
+opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
+
+# Usar popover que se maneja automáticamente
+with col_header_right:
+    with st.popover("☰", use_container_width=True):
+        st.markdown("### Navegación")
+        
+        # Botones del menú
+        for opcion in opciones_menu:
+            if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
+                st.session_state.seccion_actual = opcion
+                st.rerun()
 
 # --- DASHBOARD ---
 if df.empty: 
