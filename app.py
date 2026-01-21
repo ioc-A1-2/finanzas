@@ -28,7 +28,7 @@ st.set_page_config(
     page_title="Finanzas Proactivas €", 
     layout="wide", 
     page_icon="💶",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"  # Colapsado por defecto en móvil
 )
 
 # --- CSS PERSONALIZADO PARA MEJOR DISEÑO Y RESPONSIVE ---
@@ -40,74 +40,196 @@ st.markdown("""
         padding-bottom: 2rem;
     }
     
-    /* Mejor espaciado en móviles */
+    /* Mejor espaciado en móviles - Optimizado para Chrome Android */
     @media (max-width: 768px) {
+        /* Contenedor principal más compacto */
         .main .block-container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-            padding-top: 1rem;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 1rem !important;
+            max-width: 100% !important;
         }
         
-        /* Sidebar más compacta en móvil */
-        .css-1d391kg {
-            padding-top: 1rem;
+        /* Reducir padding del header */
+        header[data-testid="stHeader"] {
+            padding: 0.5rem 0.75rem !important;
         }
         
-        /* Mejorar inputs en móvil */
-        .stTextInput input, .stNumberInput input, .stSelectbox select {
-            font-size: 16px !important; /* Evita zoom en iOS */
+        /* Sidebar como overlay en móvil */
+        section[data-testid="stSidebar"] {
+            min-width: 280px !important;
+            max-width: 320px !important;
+            position: fixed !important;
+            z-index: 999 !important;
         }
         
-        /* Mejorar botones */
+        /* Cuando sidebar está abierta, oscurecer fondo */
+        section[data-testid="stSidebar"]::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        /* Contenedor principal cuando sidebar está abierta */
+        .main .block-container {
+            width: 100% !important;
+        }
+        
+        /* Mejorar inputs en móvil - Chrome Android */
+        .stTextInput > div > div > input,
+        .stNumberInput > div > div > input,
+        .stSelectbox > div > div > select {
+            font-size: 16px !important;
+            padding: 0.625rem 0.75rem !important;
+            min-height: 44px !important;
+        }
+        
+        /* Mejorar botones en móvil */
         .stButton > button {
-            width: 100%;
+            width: 100% !important;
             margin-bottom: 0.5rem;
+            min-height: 44px !important;
+            font-size: 0.95rem !important;
+            padding: 0.625rem 1rem !important;
         }
         
-        /* Tabs más accesibles */
+        /* Tabs más compactos y accesibles */
         .stTabs [data-baseweb="tab-list"] {
-            gap: 0.5rem;
+            gap: 0.25rem !important;
             flex-wrap: wrap;
         }
         
-        /* Métricas más compactas */
-        .stMetric {
-            padding: 0.5rem;
+        .stTabs [data-baseweb="tab"] {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.85rem !important;
+            min-width: auto !important;
+        }
+        
+        /* Métricas en una sola columna en móvil */
+        [data-testid="stMetricContainer"] {
+            margin-bottom: 0.75rem !important;
+        }
+        
+        /* Columnas se apilan en móvil */
+        .stColumn {
+            width: 100% !important;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Headers más pequeños */
+        h1 {
+            font-size: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        h2 {
+            font-size: 1.25rem !important;
+            margin-top: 1rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        /* Formularios más compactos */
+        .stForm {
+            padding: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        /* Radio buttons más compactos */
+        .stRadio > div {
+            gap: 0.5rem !important;
+            flex-wrap: wrap;
+        }
+        
+        .stRadio > div > label {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.9rem !important;
+        }
+        
+        /* Selectbox más compacto */
+        .stSelectbox {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Chat messages más compactos */
+        .stChatMessage {
+            padding: 0.75rem !important;
+            margin-bottom: 0.5rem !important;
+            font-size: 0.9rem !important;
+        }
+        
+        /* Tablas más compactas */
+        .stDataFrame {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Espaciado entre elementos reducido */
+        .element-container {
+            margin-bottom: 0.75rem !important;
+        }
+        
+        /* Info boxes más compactos */
+        .stInfo, .stSuccess, .stWarning, .stError {
+            padding: 0.75rem !important;
+            font-size: 0.9rem !important;
+            margin-bottom: 0.5rem !important;
         }
     }
     
-    /* Mejorar el date input para móviles */
+    /* Mejorar el date input para móviles - Chrome Android */
     @media (max-width: 768px) {
-        /* Asegurar que el calendario sea visible y no se oculte */
+        /* Asegurar que el calendario sea visible y centrado */
         div[data-baseweb="popover"] {
-            z-index: 9999 !important;
+            z-index: 10000 !important;
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
-            max-width: 90vw !important;
-            max-height: 90vh !important;
+            max-width: 95vw !important;
+            max-height: 85vh !important;
             overflow-y: auto !important;
+            background: var(--background-color) !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
         }
         
-        /* Input de fecha más grande en móvil para evitar zoom */
+        /* Input de fecha optimizado para móvil */
         .stDateInput > div > div > input {
             font-size: 16px !important;
-            padding: 0.75rem !important;
-            min-height: 48px !important;
+            padding: 0.625rem 0.75rem !important;
+            min-height: 44px !important;
         }
         
-        /* Calendario más grande y accesible */
+        /* Calendario más accesible en móvil */
         .rdp {
-            font-size: 1.1rem !important;
+            font-size: 1rem !important;
         }
         
-        /* Asegurar que el sidebar no se oculte al hacer scroll */
+        .rdp-day {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+        }
+        
+        /* Sidebar scrollable */
         section[data-testid="stSidebar"] {
-            position: sticky !important;
-            top: 0 !important;
-            height: 100vh !important;
             overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        
+        /* Botón de toggle sidebar más visible */
+        button[data-testid="baseButton-header"] {
+            min-width: 44px !important;
+            min-height: 44px !important;
         }
     }
     
@@ -177,11 +299,28 @@ st.markdown("""
         padding: 0.75rem 1.5rem;
     }
     
-    /* Mejorar sidebar en móvil */
+    /* Mejorar visualización general en móvil */
     @media (max-width: 768px) {
-        section[data-testid="stSidebar"] {
-            min-width: 100% !important;
-            max-width: 100% !important;
+        /* Viewport height fix para móviles */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* Mejorar gráficos en móvil */
+        .js-plotly-plot {
+            width: 100% !important;
+        }
+        
+        /* Captions más pequeños */
+        .stCaption {
+            font-size: 0.8rem !important;
+        }
+        
+        /* Expandable sections más compactos */
+        .streamlit-expanderHeader {
+            font-size: 0.95rem !important;
+            padding: 0.75rem !important;
         }
     }
     
