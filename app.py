@@ -28,7 +28,7 @@ st.set_page_config(
     page_title="Finanzas Proactivas €", 
     layout="wide", 
     page_icon="💶",
-    initial_sidebar_state="collapsed"  # Colapsado por defecto en móvil
+    initial_sidebar_state="collapsed"  # Colapsado por defecto
 )
 
 # --- CSS PERSONALIZADO PARA MEJOR DISEÑO Y RESPONSIVE ---
@@ -56,18 +56,14 @@ st.markdown("""
             padding: 0.5rem 0.75rem !important;
         }
         
-        /* Sidebar como overlay en móvil */
+        /* Ocultar sidebar completamente */
         section[data-testid="stSidebar"] {
-            min-width: 280px !important;
-            max-width: 320px !important;
-            position: fixed !important;
-            z-index: 999 !important;
-            height: 100vh !important;
-            top: 0 !important;
-            left: 0 !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
+            display: none !important;
+        }
+        
+        /* Ocultar botón de toggle sidebar */
+        button[data-testid="baseButton-header"] {
+            display: none !important;
         }
         
         /* Contenedor interno de la sidebar */
@@ -226,12 +222,9 @@ st.markdown("""
             user-select: none !important;
         }
         
-        /* Prevenir que el input de fecha abra el teclado */
-        .stDateInput input[readonly],
+        /* Asegurar que el calendario sea clickeable */
         .stDateInput input {
-            readonly: true !important;
-            -webkit-user-select: none !important;
-            user-select: none !important;
+            cursor: pointer !important;
         }
         
         /* Calendario más accesible en móvil */
@@ -397,27 +390,40 @@ st.markdown("""
         top: 0 !important;
         z-index: 100 !important;
         background: var(--background-color) !important;
-        padding: 0.75rem 1rem !important;
-        margin: -1rem -1rem 1rem -1rem !important;
+        padding: 0.5rem 1rem !important;
+        margin: -1rem -1rem 0.5rem -1rem !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
         backdrop-filter: blur(10px);
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.5rem;
     }
     
     @media (max-width: 768px) {
         .top-header {
-            padding: 0.5rem 0.75rem !important;
-            margin: -0.5rem -0.75rem 0.75rem -0.75rem !important;
+            padding: 0.4rem 0.75rem !important;
+            margin: -0.5rem -0.75rem 0.5rem -0.75rem !important;
+            flex-wrap: nowrap !important;
         }
         
-        /* Menú más compacto en móvil */
-        .top-header .stSelectbox {
-            font-size: 0.9rem !important;
+        .top-header h3 {
+            font-size: 1.1rem !important;
+            margin: 0 !important;
+            flex: 1 !important;
         }
         
         .top-header .stButton > button {
             font-size: 0.85rem !important;
-            padding: 0.5rem 0.75rem !important;
+            padding: 0.4rem 0.75rem !important;
+            min-width: auto !important;
+        }
+        
+        /* Menú hamburger compacto */
+        .hamburger-menu-btn {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 1.2rem !important;
         }
     }
     
@@ -716,93 +722,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- JAVASCRIPT PARA PREVENIR PROBLEMAS DEL CALENDARIO EN MÓVIL ---
-st.components.v1.html("""
-<script>
-(function() {
-    function fixDateInput() {
-        // Prevenir que el input de fecha abra el teclado
-        const dateInputs = document.querySelectorAll('.stDateInput input');
-        dateInputs.forEach(input => {
-            if (!input.hasAttribute('data-fixed')) {
-                input.setAttribute('readonly', 'readonly');
-                input.setAttribute('inputmode', 'none');
-                input.setAttribute('data-fixed', 'true');
-                
-                // Prevenir focus que abriría el teclado
-                input.addEventListener('focus', function(e) {
-                    e.preventDefault();
-                    setTimeout(() => this.blur(), 0);
-                }, true);
-                
-                // Prevenir touchstart
-                input.addEventListener('touchstart', function(e) {
-                    // Permitir que el calendario se abra pero prevenir teclado
-                    setTimeout(() => {
-                        if (document.activeElement === this) {
-                            this.blur();
-                        }
-                    }, 100);
-                }, {passive: true});
-                
-                // Prevenir que el formulario se recargue al cambiar fecha
-                input.addEventListener('change', function(e) {
-                    e.stopPropagation();
-                }, true);
-            }
-        });
-        
-        // Prevenir que clicks en el calendario cierren el formulario
-        const calendarPopover = document.querySelector('[data-baseweb="popover"]');
-        if (calendarPopover) {
-            calendarPopover.addEventListener('click', function(e) {
-                e.stopPropagation();
-            }, true);
-            
-            // Prevenir clicks en días del calendario
-            const calendarDays = calendarPopover.querySelectorAll('.rdp-day, [role="gridcell"]');
-            calendarDays.forEach(day => {
-                day.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    // Forzar que el formulario se mantenga visible
-                    setTimeout(() => {
-                        const form = document.querySelector('form[data-testid="stForm"]');
-                        if (form) {
-                            form.style.display = 'block';
-                            form.style.visibility = 'visible';
-                        }
-                    }, 100);
-                }, true);
-            });
-        }
-        
-        // Observar cambios en el DOM para aplicar fixes a nuevos elementos
-        const observer = new MutationObserver(function(mutations) {
-            dateInputs.forEach(input => {
-                if (input && !input.hasAttribute('data-fixed')) {
-                    fixDateInput();
-                }
-            });
-        });
-        
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    }
-    
-    // Ejecutar al cargar y después de un delay
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', fixDateInput);
-    } else {
-        fixDateInput();
-    }
-    
-    // Ejecutar periódicamente para asegurar que se aplica
-    setInterval(fixDateInput, 1000);
-})();
-</script>
-""", height=0)
+# JavaScript eliminado - El calendario funciona correctamente por defecto
 
 # --- CONSTANTES ---
 FILE_NAME = "finanzas.csv"
@@ -1502,23 +1422,11 @@ df = load_data()
 df_rec = load_recurrentes()
 lista_cats = load_categories()
 
-# --- SIDEBAR ---
-st.sidebar.header("📝 Gestión de Movimientos")
-
+# --- SIDEBAR OCULTO ---
+# La sidebar está oculta completamente para aprovechar todo el espacio
 # El modo simulación ahora está en el formulario
 if 'modo_simulacion' not in st.session_state:
     st.session_state.modo_simulacion = False
-
-if st.session_state.modo_simulacion and len(st.session_state.simulacion) > 0:
-    st.sidebar.info(f"Items simulados: {len(st.session_state.simulacion)}")
-
-# RECORDATORIOS DE GASTOS RECURRENTES
-recordatorios = get_recordatorios_recurrentes(df_rec)
-if recordatorios:
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("**🔔 Recordatorios:**")
-    for rec in recordatorios[:3]:  # Mostrar máximo 3
-        st.sidebar.caption(f"💡 {rec['mensaje']}")
 
 # El botón de alta está ahora en el header superior
 
@@ -1557,7 +1465,8 @@ if st.session_state.show_modal:
                     "📅 Fecha", 
                     datetime.now(), 
                     format="DD/MM/YYYY",
-                    key="fecha_input_modal"
+                    key="fecha_input_modal",
+                    help="Haz clic para abrir el calendario"
                 )
             with col_cat:
                 cat = st.selectbox("Categoría", lista_cats, key="cat_select_modal")
@@ -1635,9 +1544,9 @@ if st.session_state.show_modal:
             st.rerun()
 
 # --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
-st.markdown('<div class="top-header">', unsafe_allow_html=True)
-col_header1, col_header2, col_header3 = st.columns([3, 1, 1])
-with col_header1:
+# --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
+col_header_left, col_header_right = st.columns([2, 1])
+with col_header_left:
     # Título dinámico según sección
     titulos_secciones = {
         "🤖 Asesor": "🤖 Asesor Financiero",
@@ -1651,23 +1560,25 @@ with col_header1:
     }
     titulo_actual = titulos_secciones.get(st.session_state.seccion_actual, "🚀 Finanzas Personales")
     st.markdown(f"### {titulo_actual}")
-with col_header2:
-    # Botón de nuevo movimiento más pequeño e intuitivo
-    if st.button("➕ Nuevo", type="primary", use_container_width=True, key="btn_alta_header"):
-        st.session_state.show_modal = True
-        st.rerun()
-with col_header3:
-    # Menú hamburger usando popover de Streamlit
-    opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
-    
-    with st.popover("☰ Menú", use_container_width=True):
-        st.markdown("**Navegación:**")
-        for opcion in opciones_menu:
-            if st.button(opcion, key=f"menu_{opcion}", use_container_width=True):
-                st.session_state.seccion_actual = opcion
-                st.rerun()
 
-st.markdown('</div>', unsafe_allow_html=True)
+with col_header_right:
+    # Botón de nuevo movimiento y menú hamburger en la derecha
+    col_btn, col_menu = st.columns([1, 1])
+    with col_btn:
+        # Botón de nuevo movimiento más pequeño e intuitivo
+        if st.button("➕ Nuevo", type="primary", use_container_width=True, key="btn_alta_header"):
+            st.session_state.show_modal = True
+            st.rerun()
+    with col_menu:
+        # Menú hamburger usando popover de Streamlit - siempre visible
+        opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
+        
+        with st.popover("☰", use_container_width=True):
+            st.markdown("**Navegación:**")
+            for opcion in opciones_menu:
+                if st.button(opcion, key=f"menu_{opcion}", use_container_width=True):
+                    st.session_state.seccion_actual = opcion
+                    st.rerun()
 
 # --- DASHBOARD ---
 if df.empty: 
