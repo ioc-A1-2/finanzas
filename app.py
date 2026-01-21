@@ -1507,7 +1507,7 @@ if st.session_state.show_modal:
             modo_simulacion = st.checkbox("🧪 Simulación", help="Prueba sin guardar", value=st.session_state.modo_simulacion, key="modo_sim_modal")
             st.session_state.modo_simulacion = modo_simulacion
         with col_tipo:
-    tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
+            tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
         
         # Segunda fila: Gasto Conjunto
         es_conjunto = st.checkbox("👥 Gasto Conjunto (Dividir entre 2)", key="es_conjunto_modal")
