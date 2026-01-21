@@ -1501,99 +1501,99 @@ if 'modo_simulacion' not in st.session_state:
 if st.session_state.show_modal:
     # Formulario inteligente y adaptativo - sin título ni X
     with st.form("form_reg_modal", clear_on_submit=True):
-            # Primera fila: Modo Simulación y Tipo
-            col_sim, col_tipo = st.columns([1, 2])
-            with col_sim:
-                modo_simulacion = st.checkbox("🧪 Simulación", help="Prueba sin guardar", value=st.session_state.modo_simulacion, key="modo_sim_modal")
-                st.session_state.modo_simulacion = modo_simulacion
-            with col_tipo:
-                tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
-            
-            # Segunda fila: Gasto Conjunto
-            es_conjunto = st.checkbox("👥 Gasto Conjunto (Dividir entre 2)", key="es_conjunto_modal")
-            
-            # Tercera fila: Fecha y Categoría
-            col_fecha, col_cat = st.columns(2)
-            with col_fecha:
-                fecha = st.date_input(
-                    "📅 Fecha", 
-                    datetime.now(), 
-                    format="DD/MM/YYYY",
-                    key="fecha_input_modal"
-                )
-            with col_cat:
-                cat = st.selectbox("Categoría", lista_cats, key="cat_select_modal")
-            
-            # Cuarta fila: Concepto (ancho completo)
-            con = st.text_input("Concepto", key="concepto_input_modal", placeholder="Descripción del movimiento")
-            
-            # Quinta fila: Importe y Frecuencia (Frecuencia visible antes del botón)
-            col_imp, col_fre = st.columns([2, 1])
-            with col_imp:
-                imp_input = st.number_input(
-                    "Importe Total (€)", 
-                    min_value=0.0, 
-                    step=0.01, 
-                    format="%.2f",
-                    key="importe_input_modal"
-                )
-            with col_fre:
-                fre = st.selectbox(
-                    "Frecuencia", 
-                    ["Puntual", "Mensual", "Anual"],
-                    key="frecuencia_select_modal"
-                )
-            
-            # Mostrar cálculo si es conjunto
-            imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
-            if es_conjunto and tipo == "Gasto" and imp_input > 0:
-                st.info(f"ℹ️ Se registrarán **{imp_real:.2f} €** (mitad del total)")
-
-            # Botones de acción
-            btn = "➕ Añadir a Simulación" if modo_simulacion else "💾 Guardar"
-            
-            col_submit, col_cancel = st.columns([2, 1])
-            with col_submit:
-                submitted = st.form_submit_button(btn, type="primary", use_container_width=True)
-            with col_cancel:
-                if st.form_submit_button("❌ Cancelar", use_container_width=True):
-                    st.session_state.show_modal = False
-                    st.rerun()
-            
-            if submitted:
-                if imp_input > 0 and con:
-                    impacto = imp_real / 12 if fre == "Anual" else imp_real
-                    
-                    if modo_simulacion:
-                        # LÓGICA DE SIMULACIÓN CORREGIDA
-                        st.session_state.simulacion.append({
-                            "Fecha": fecha.strftime("%d/%m/%Y"), 
-                            "Tipo": tipo, 
-                            "Concepto": f"{con} (Sim)",
-                            "Importe": imp_real, 
-                            "Frecuencia": fre, 
-                            "Impacto_Mensual": impacto, 
-                            "Es_Conjunto": es_conjunto
-                        })
-                        st.session_state.show_modal = False
-                        st.success("Añadido a simulación")
-                        st.rerun()
-                    else:
-                        # LÓGICA DE GUARDADO REAL
-                        new_row = pd.DataFrame([[pd.to_datetime(fecha), tipo, cat, con, imp_real, fre, impacto, es_conjunto]], columns=COLUMNS)
-                        df = pd.concat([df, new_row], ignore_index=True)
-                        save_all_data(df)
-                        registrar_cambio("Alta", f"Nuevo movimiento: {con} ({imp_real:.2f} €)")
-                        st.session_state.show_modal = False
-                        st.success("Guardado")
-                        st.rerun()
-                else: 
-                    st.error("Faltan datos")
+        # Primera fila: Modo Simulación y Tipo
+        col_sim, col_tipo = st.columns([1, 2])
+        with col_sim:
+            modo_simulacion = st.checkbox("🧪 Simulación", help="Prueba sin guardar", value=st.session_state.modo_simulacion, key="modo_sim_modal")
+            st.session_state.modo_simulacion = modo_simulacion
+        with col_tipo:
+            tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
         
-        # Botón para cerrar el modal (fuera del form)
-        if st.button("❌ Cerrar", use_container_width=True, key="close_modal_btn"):
-            st.session_state.show_modal = False
-            st.rerun()
+        # Segunda fila: Gasto Conjunto
+        es_conjunto = st.checkbox("👥 Gasto Conjunto (Dividir entre 2)", key="es_conjunto_modal")
+        
+        # Tercera fila: Fecha y Categoría
+        col_fecha, col_cat = st.columns(2)
+        with col_fecha:
+            fecha = st.date_input(
+                "📅 Fecha", 
+                datetime.now(), 
+                format="DD/MM/YYYY",
+                key="fecha_input_modal"
+            )
+        with col_cat:
+            cat = st.selectbox("Categoría", lista_cats, key="cat_select_modal")
+        
+        # Cuarta fila: Concepto (ancho completo)
+        con = st.text_input("Concepto", key="concepto_input_modal", placeholder="Descripción del movimiento")
+        
+        # Quinta fila: Importe y Frecuencia (Frecuencia visible antes del botón)
+        col_imp, col_fre = st.columns([2, 1])
+        with col_imp:
+            imp_input = st.number_input(
+                "Importe Total (€)", 
+                min_value=0.0, 
+                step=0.01, 
+                format="%.2f",
+                key="importe_input_modal"
+            )
+        with col_fre:
+            fre = st.selectbox(
+                "Frecuencia", 
+                ["Puntual", "Mensual", "Anual"],
+                key="frecuencia_select_modal"
+            )
+        
+        # Mostrar cálculo si es conjunto
+        imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
+        if es_conjunto and tipo == "Gasto" and imp_input > 0:
+            st.info(f"ℹ️ Se registrarán **{imp_real:.2f} €** (mitad del total)")
+
+        # Botones de acción
+        btn = "➕ Añadir a Simulación" if modo_simulacion else "💾 Guardar"
+        
+        col_submit, col_cancel = st.columns([2, 1])
+        with col_submit:
+            submitted = st.form_submit_button(btn, type="primary", use_container_width=True)
+        with col_cancel:
+            if st.form_submit_button("❌ Cancelar", use_container_width=True):
+                st.session_state.show_modal = False
+                st.rerun()
+        
+        if submitted:
+            if imp_input > 0 and con:
+                impacto = imp_real / 12 if fre == "Anual" else imp_real
+                
+                if modo_simulacion:
+                    # LÓGICA DE SIMULACIÓN CORREGIDA
+                    st.session_state.simulacion.append({
+                        "Fecha": fecha.strftime("%d/%m/%Y"), 
+                        "Tipo": tipo, 
+                        "Concepto": f"{con} (Sim)",
+                        "Importe": imp_real, 
+                        "Frecuencia": fre, 
+                        "Impacto_Mensual": impacto, 
+                        "Es_Conjunto": es_conjunto
+                    })
+                    st.session_state.show_modal = False
+                    st.success("Añadido a simulación")
+                    st.rerun()
+                else:
+                    # LÓGICA DE GUARDADO REAL
+                    new_row = pd.DataFrame([[pd.to_datetime(fecha), tipo, cat, con, imp_real, fre, impacto, es_conjunto]], columns=COLUMNS)
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    save_all_data(df)
+                    registrar_cambio("Alta", f"Nuevo movimiento: {con} ({imp_real:.2f} €)")
+                    st.session_state.show_modal = False
+                    st.success("Guardado")
+                    st.rerun()
+            else: 
+                st.error("Faltan datos")
+    
+    # Botón para cerrar el modal (fuera del form)
+    if st.button("❌ Cerrar", use_container_width=True, key="close_modal_btn"):
+        st.session_state.show_modal = False
+        st.rerun()
 
 # --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
 if 'menu_abierto' not in st.session_state:
