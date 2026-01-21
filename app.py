@@ -1632,67 +1632,41 @@ with col_header_right:
 
 # Menú lateral derecho con CSS (sin bloquear la app)
 if st.session_state.menu_abierto:
+    # Crear menú lateral derecho con contenedor de Streamlit
     st.markdown("""
     <style>
-    .side-menu-overlay {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.3);
-        z-index: 99998;
-        pointer-events: auto;
-    }
-    .side-menu-right {
+    .menu-wrapper {
         position: fixed;
         top: 0;
         right: 0;
         width: 280px;
-        height: 100%;
+        height: 100vh;
         background: var(--background-color);
         box-shadow: -2px 0 10px rgba(0,0,0,0.3);
         z-index: 99999;
         padding: 1rem;
         overflow-y: auto;
-        animation: slideInRight 0.3s ease;
-    }
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-        }
-        to {
-            transform: translateX(0);
-        }
     }
     </style>
-    <div class="side-menu-overlay" onclick="closeMenu()"></div>
-    <div class="side-menu-right">
-        <h3 style="margin-top: 0;">Navegación</h3>
-        <button onclick="closeMenu()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
-    </div>
-    <script>
-    function closeMenu() {
-        window.parent.postMessage({type: 'closeMenu'}, '*');
-    }
-    </script>
     """, unsafe_allow_html=True)
     
-    st.markdown("### Navegación")
-    
-    # Botón para cerrar menú
-    if st.button("✕ Cerrar", use_container_width=True, key="btn_cerrar_menu"):
-        st.session_state.menu_abierto = False
-        st.rerun()
-    
-    st.markdown("---")
-    
-    # Botones del menú
-    for opcion in opciones_menu:
-        if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
-            st.session_state.seccion_actual = opcion
-            st.session_state.menu_abierto = False  # Cerrar menú al seleccionar
+    # Contenedor para el menú lateral derecho
+    with st.container():
+        st.markdown("### Navegación")
+        
+        # Botón para cerrar menú
+        if st.button("✕ Cerrar", use_container_width=True, key="btn_cerrar_menu"):
+            st.session_state.menu_abierto = False
             st.rerun()
+        
+        st.markdown("---")
+        
+        # Botones del menú
+        for opcion in opciones_menu:
+            if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
+                st.session_state.seccion_actual = opcion
+                st.session_state.menu_abierto = False  # Cerrar menú al seleccionar
+                st.rerun()
 
 # --- DASHBOARD ---
 if df.empty: 
