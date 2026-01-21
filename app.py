@@ -1515,10 +1515,10 @@ if st.session_state.show_modal:
         # Tercera fila: Fecha y Categoría
         col_fecha, col_cat = st.columns(2)
         with col_fecha:
-    fecha = st.date_input(
+            fecha = st.date_input(
                 "📅 Fecha", 
-        datetime.now(), 
-        format="DD/MM/YYYY",
+                datetime.now(), 
+                format="DD/MM/YYYY",
                 key="fecha_input_modal"
             )
         with col_cat:
