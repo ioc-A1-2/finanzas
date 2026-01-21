@@ -222,9 +222,17 @@ st.markdown("""
             user-select: none !important;
         }
         
-        /* Asegurar que el calendario sea clickeable */
+        /* Asegurar que el calendario sea clickeable y no abra teclado */
         .stDateInput input {
             cursor: pointer !important;
+            readonly: true !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+        }
+        
+        /* Prevenir que el input de fecha abra el teclado en móvil */
+        .stDateInput input:focus {
+            outline: none !important;
         }
         
         /* Calendario más accesible en móvil */
@@ -381,7 +389,26 @@ st.markdown("""
         max-width: 100% !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
+        padding-top: 0.25rem !important;
+    }
+    
+    /* Eliminar espacio superior innecesario */
+    header[data-testid="stHeader"] {
         padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding-top: 0.1rem !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        
+        header[data-testid="stHeader"] {
+            padding-top: 0.25rem !important;
+            padding-bottom: 0.25rem !important;
+        }
     }
     
     /* Header fijo con botón de alta - Siempre visible */
@@ -1430,23 +1457,10 @@ if 'modo_simulacion' not in st.session_state:
 
 # El botón de alta está ahora en el header superior
 
-# Modal/Popup para el formulario - Usando contenedor destacado
+# Modal/Popup para el formulario - Sin título ni X, directo al formulario
 if st.session_state.show_modal:
-    # Contenedor destacado para el formulario
-    with st.container():
-        st.markdown("---")
-        col_titulo, col_cerrar = st.columns([4, 1])
-        with col_titulo:
-            st.markdown("### 📝 Nuevo Movimiento")
-        with col_cerrar:
-            if st.button("❌", key="btn_cerrar_modal", help="Cerrar"):
-                st.session_state.show_modal = False
-                st.rerun()
-        
-        st.markdown("---")
-        
-        # Formulario inteligente y adaptativo dentro del modal
-        with st.form("form_reg_modal", clear_on_submit=True):
+    # Formulario inteligente y adaptativo - sin título ni X
+    with st.form("form_reg_modal", clear_on_submit=True):
             # Primera fila: Modo Simulación y Tipo
             col_sim, col_tipo = st.columns([1, 2])
             with col_sim:
@@ -1465,8 +1479,7 @@ if st.session_state.show_modal:
                     "📅 Fecha", 
                     datetime.now(), 
                     format="DD/MM/YYYY",
-                    key="fecha_input_modal",
-                    help="Haz clic para abrir el calendario"
+                    key="fecha_input_modal"
                 )
             with col_cat:
                 cat = st.selectbox("Categoría", lista_cats, key="cat_select_modal")
@@ -1474,7 +1487,7 @@ if st.session_state.show_modal:
             # Cuarta fila: Concepto (ancho completo)
             con = st.text_input("Concepto", key="concepto_input_modal", placeholder="Descripción del movimiento")
             
-            # Quinta fila: Importe y Frecuencia
+            # Quinta fila: Importe y Frecuencia (Frecuencia visible antes del botón)
             col_imp, col_fre = st.columns([2, 1])
             with col_imp:
                 imp_input = st.number_input(
@@ -1537,15 +1550,16 @@ if st.session_state.show_modal:
                 else: 
                     st.error("Faltan datos")
         
-        st.markdown("---")
         # Botón para cerrar el modal (fuera del form)
         if st.button("❌ Cerrar", use_container_width=True, key="close_modal_btn"):
             st.session_state.show_modal = False
             st.rerun()
 
 # --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
-# --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
-col_header_left, col_header_right = st.columns([2, 1])
+if 'menu_abierto' not in st.session_state:
+    st.session_state.menu_abierto = False
+
+col_header_left, col_header_center, col_header_right = st.columns([3, 1, 1])
 with col_header_left:
     # Título dinámico según sección
     titulos_secciones = {
@@ -1561,24 +1575,68 @@ with col_header_left:
     titulo_actual = titulos_secciones.get(st.session_state.seccion_actual, "🚀 Finanzas Personales")
     st.markdown(f"### {titulo_actual}")
 
+with col_header_center:
+    # Botón de nuevo movimiento más pequeño (no ocupa todo el ancho)
+    if st.button("➕ Nuevo", type="primary", key="btn_alta_header"):
+        st.session_state.show_modal = True
+        st.rerun()
+
 with col_header_right:
-    # Botón de nuevo movimiento y menú hamburger en la derecha
-    col_btn, col_menu = st.columns([1, 1])
-    with col_btn:
-        # Botón de nuevo movimiento más pequeño e intuitivo
-        if st.button("➕ Nuevo", type="primary", use_container_width=True, key="btn_alta_header"):
-            st.session_state.show_modal = True
+    # Botón hamburger para abrir menú lateral
+    if st.button("☰", key="btn_hamburger", help="Menú"):
+        st.session_state.menu_abierto = not st.session_state.menu_abierto
+        st.rerun()
+
+# Menú lateral izquierdo
+if st.session_state.menu_abierto:
+    # Overlay y menú lateral con CSS
+    st.markdown("""
+    <style>
+    .side-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99998;
+    }
+    .side-menu-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100%;
+        background: var(--background-color);
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        z-index: 99999;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+    </style>
+    <div class="side-menu-overlay"></div>
+    <div class="side-menu-container">
+    """, unsafe_allow_html=True)
+    
+    opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
+    
+    st.markdown("### Navegación")
+    
+    # Botón para cerrar menú
+    if st.button("✕ Cerrar", use_container_width=True, key="btn_cerrar_menu"):
+        st.session_state.menu_abierto = False
+        st.rerun()
+    
+    st.markdown("---")
+    
+    # Botones del menú
+    for opcion in opciones_menu:
+        if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
+            st.session_state.seccion_actual = opcion
+            st.session_state.menu_abierto = False
             st.rerun()
-    with col_menu:
-        # Menú hamburger usando popover de Streamlit - siempre visible
-        opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
-        
-        with st.popover("☰", use_container_width=True):
-            st.markdown("**Navegación:**")
-            for opcion in opciones_menu:
-                if st.button(opcion, key=f"menu_{opcion}", use_container_width=True):
-                    st.session_state.seccion_actual = opcion
-                    st.rerun()
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # --- DASHBOARD ---
 if df.empty: 
