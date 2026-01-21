@@ -58,8 +58,8 @@ GEMINI_MODEL = None
 if GEMINI_ENABLED:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        # Usar el modelo gemini-1.5-flash para respuestas rápidas (o gemini-1.5-pro para más precisión)
-        GEMINI_MODEL = genai.GenerativeModel('gemini-1.5-flash')
+        # Usar gemini-pro que es el modelo más estable y ampliamente disponible
+        GEMINI_MODEL = genai.GenerativeModel('gemini-pro')
     except Exception as e:
         GEMINI_ENABLED = False
         GEMINI_MODEL = None
