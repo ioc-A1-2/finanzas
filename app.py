@@ -1543,15 +1543,15 @@ if st.session_state.show_modal:
                 ["Puntual", "Mensual", "Anual"],
                 key="frecuencia_select_modal"
             )
-    
+        
         # Mostrar cálculo si es conjunto
-    imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
-    if es_conjunto and tipo == "Gasto" and imp_input > 0:
+        imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
+        if es_conjunto and tipo == "Gasto" and imp_input > 0:
             st.info(f"ℹ️ Se registrarán **{imp_real:.2f} €** (mitad del total)")
 
         # Botones de acción
-    btn = "➕ Añadir a Simulación" if modo_simulacion else "💾 Guardar"
-    
+        btn = "➕ Añadir a Simulación" if modo_simulacion else "💾 Guardar"
+        
         col_submit, col_cancel = st.columns([2, 1])
         with col_submit:
             submitted = st.form_submit_button(btn, type="primary", use_container_width=True)
@@ -1559,34 +1559,34 @@ if st.session_state.show_modal:
             if st.form_submit_button("❌ Cancelar", use_container_width=True):
                 st.session_state.show_modal = False
                 st.rerun()
-    
-    if submitted:
-        if imp_input > 0 and con:
-            impacto = imp_real / 12 if fre == "Anual" else imp_real
-            
-            if modo_simulacion:
-                # LÓGICA DE SIMULACIÓN CORREGIDA
-                st.session_state.simulacion.append({
-                    "Fecha": fecha.strftime("%d/%m/%Y"), 
-                    "Tipo": tipo, 
-                    "Concepto": f"{con} (Sim)",
-                    "Importe": imp_real, 
-                    "Frecuencia": fre, 
-                    "Impacto_Mensual": impacto, 
-                    "Es_Conjunto": es_conjunto
-                })
+        
+        if submitted:
+            if imp_input > 0 and con:
+                impacto = imp_real / 12 if fre == "Anual" else imp_real
+                
+                if modo_simulacion:
+                    # LÓGICA DE SIMULACIÓN CORREGIDA
+                    st.session_state.simulacion.append({
+                        "Fecha": fecha.strftime("%d/%m/%Y"), 
+                        "Tipo": tipo, 
+                        "Concepto": f"{con} (Sim)",
+                        "Importe": imp_real, 
+                        "Frecuencia": fre, 
+                        "Impacto_Mensual": impacto, 
+                        "Es_Conjunto": es_conjunto
+                    })
                     st.session_state.show_modal = False
-                st.success("Añadido a simulación")
-                st.rerun()
-            else:
-                # LÓGICA DE GUARDADO REAL
-                new_row = pd.DataFrame([[pd.to_datetime(fecha), tipo, cat, con, imp_real, fre, impacto, es_conjunto]], columns=COLUMNS)
-                df = pd.concat([df, new_row], ignore_index=True)
-                save_all_data(df)
-                registrar_cambio("Alta", f"Nuevo movimiento: {con} ({imp_real:.2f} €)")
+                    st.success("Añadido a simulación")
+                    st.rerun()
+                else:
+                    # LÓGICA DE GUARDADO REAL
+                    new_row = pd.DataFrame([[pd.to_datetime(fecha), tipo, cat, con, imp_real, fre, impacto, es_conjunto]], columns=COLUMNS)
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    save_all_data(df)
+                    registrar_cambio("Alta", f"Nuevo movimiento: {con} ({imp_real:.2f} €)")
                     st.session_state.show_modal = False
-                st.success("Guardado")
-                st.rerun()
+                    st.success("Guardado")
+                    st.rerun()
             else:
                 st.error("Faltan datos")
     
