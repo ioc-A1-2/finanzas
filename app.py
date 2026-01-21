@@ -62,6 +62,19 @@ st.markdown("""
             max-width: 320px !important;
             position: fixed !important;
             z-index: 999 !important;
+            height: 100vh !important;
+            top: 0 !important;
+            left: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        
+        /* Contenedor interno de la sidebar */
+        section[data-testid="stSidebar"] > div {
+            height: auto !important;
+            min-height: 100% !important;
+            padding-bottom: 2rem !important;
         }
         
         /* Cuando sidebar está abierta, oscurecer fondo */
@@ -74,6 +87,7 @@ st.markdown("""
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: -1;
+            pointer-events: none;
         }
         
         /* Contenedor principal cuando sidebar está abierta */
@@ -230,11 +244,27 @@ st.markdown("""
             height: 2.5rem !important;
         }
         
-        /* Sidebar scrollable */
+        /* Asegurar que la sidebar sea scrollable en móvil */
         section[data-testid="stSidebar"] {
             overflow-y: auto !important;
             overflow-x: hidden !important;
             -webkit-overflow-scrolling: touch !important;
+            max-height: 100vh !important;
+        }
+        
+        /* Permitir scroll en contenido de sidebar */
+        section[data-testid="stSidebar"] .css-1d391kg,
+        section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+            overflow-y: visible !important;
+            height: auto !important;
+            max-height: none !important;
+        }
+        
+        /* Asegurar que los elementos dentro de la sidebar no bloqueen el scroll */
+        section[data-testid="stSidebar"] form,
+        section[data-testid="stSidebar"] .stForm {
+            position: relative !important;
+            overflow: visible !important;
         }
         
         /* Botón de toggle sidebar más visible */
