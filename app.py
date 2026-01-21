@@ -1665,7 +1665,7 @@ if st.session_state.menu_abierto:
         for opcion in opciones_menu:
             if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
                 st.session_state.seccion_actual = opcion
-                st.session_state.menu_abierto = False  # Cerrar menú al seleccionar
+                st.session_state.menu_abierto = False  # IMPORTANTE: Cerrar menú al seleccionar
                 st.rerun()
 
 # --- DASHBOARD ---
