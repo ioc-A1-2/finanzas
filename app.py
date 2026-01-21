@@ -1530,19 +1530,19 @@ if st.session_state.show_modal:
         # Quinta fila: Importe y Frecuencia (Frecuencia visible antes del botón)
         col_imp, col_fre = st.columns([2, 1])
         with col_imp:
-    imp_input = st.number_input(
-        "Importe Total (€)", 
-        min_value=0.0, 
-        step=0.01, 
-        format="%.2f",
+            imp_input = st.number_input(
+                "Importe Total (€)", 
+                min_value=0.0, 
+                step=0.01, 
+                format="%.2f",
                 key="importe_input_modal"
-    )
+            )
         with col_fre:
-    fre = st.selectbox(
-        "Frecuencia", 
+            fre = st.selectbox(
+                "Frecuencia", 
                 ["Puntual", "Mensual", "Anual"],
                 key="frecuencia_select_modal"
-    )
+            )
     
         # Mostrar cálculo si es conjunto
     imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
