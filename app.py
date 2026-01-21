@@ -1669,18 +1669,6 @@ with col_header3:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# JavaScript para recibir mensajes del menú
-st.components.v1.html("""
-<script>
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'selectSection') {
-            // Esto se manejará con Streamlit
-            window.parent.postMessage({type: 'streamlit', section: event.data.section}, '*');
-        }
-    });
-</script>
-""", height=0, key="menu_js")
-
 # --- DASHBOARD ---
 if df.empty: 
     st.info("Empieza añadiendo movimientos.")
