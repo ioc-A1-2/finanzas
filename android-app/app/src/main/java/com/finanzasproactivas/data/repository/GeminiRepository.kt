@@ -8,10 +8,14 @@ import kotlinx.coroutines.withContext
 class GeminiRepository {
     private var model: GenerativeModel? = null
     
-    fun initialize(apiKey: String) {
+    // API Key configurada
+    private val defaultApiKey = "AIzaSyC9H41PE78zHcjuk_8RoC0BafHT67CUusw"
+    
+    fun initialize(apiKey: String? = null) {
+        val key = apiKey?.ifEmpty { null } ?: defaultApiKey
         model = generativeModel(
             modelName = "gemini-pro",
-            apiKey = apiKey
+            apiKey = key
         )
     }
     

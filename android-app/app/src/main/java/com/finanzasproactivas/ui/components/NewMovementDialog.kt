@@ -20,8 +20,14 @@ fun NewMovementDialog(
     onDismiss: () -> Unit,
     onSave: (Movimiento) -> Unit
 ) {
+    // Categorías por defecto
+    val categoriasDefault = remember {
+        listOf("Vivienda", "Transporte", "Comida", "Seguros", "Ahorro", "Ingresos", "Otros")
+    }
+    
     var tipo by remember { mutableStateOf(TipoMovimiento.GASTO) }
     var categoria by remember { mutableStateOf("") }
+    var categoriaExpanded by remember { mutableStateOf(false) }
     var concepto by remember { mutableStateOf("") }
     var importe by remember { mutableStateOf("") }
     var frecuencia by remember { mutableStateOf(Frecuencia.PUNTUAL) }
@@ -102,12 +108,34 @@ fun NewMovementDialog(
                         }
                     )
                     
-                    OutlinedTextField(
-                        value = categoria,
-                        onValueChange = { categoria = it },
-                        label = { Text("Categoría") },
-                        modifier = Modifier.weight(1f)
-                    )
+                    Box(modifier = Modifier.weight(1f)) {
+                        OutlinedTextField(
+                            value = categoria,
+                            onValueChange = {},
+                            label = { Text("Categoría") },
+                            readOnly = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            trailingIcon = {
+                                IconButton(onClick = { categoriaExpanded = true }) {
+                                    Icon(Icons.Default.ArrowDropDown, null)
+                                }
+                            }
+                        )
+                        DropdownMenu(
+                            expanded = categoriaExpanded,
+                            onDismissRequest = { categoriaExpanded = false }
+                        ) {
+                            categoriasDefault.forEach { cat ->
+                                DropdownMenuItem(
+                                    text = { Text(cat) },
+                                    onClick = {
+                                        categoria = cat
+                                        categoriaExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
                 
                 // Concepto

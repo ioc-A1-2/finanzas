@@ -3,23 +3,17 @@ package com.finanzasproactivas.data.repository
 import com.finanzasproactivas.data.model.Movimiento
 import com.finanzasproactivas.data.model.TipoMovimiento
 import com.finanzasproactivas.data.model.Frecuencia
-import com.google.api.client.auth.oauth2.Credential
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
-import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.SheetsScopes
 import com.google.api.services.sheets.v4.model.ValueRange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.InputStreamReader
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,28 +23,18 @@ class GoogleSheetsRepository(
     companion object {
         private const val APPLICATION_NAME = "Finanzas Proactivas"
         private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
-        private const val TOKENS_DIRECTORY_PATH = "tokens"
         private val SCOPES = listOf(SheetsScopes.SPREADSHEETS)
         private const val CREDENTIALS_FILE_PATH = "/credentials.json"
-        private const val SPREADSHEET_ID = "TU_SPREADSHEET_ID" // Configurar desde secrets
+        private const val SPREADSHEET_ID = "17EBvx8s1IsxcV9-RigMxYvUxgz15ZA6yIuHyY9f8xGk"
         private const val RANGE = "Finanzas!A2:H"
         
         private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     }
 
-    private fun getCredentials(httpTransport: NetHttpTransport): Credential {
-        val inputStream = applicationContext.assets.open("credentials.json")
-        val clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(inputStream))
-        
-        val flow = GoogleAuthorizationCodeFlow.Builder(
-            httpTransport, JSON_FACTORY, clientSecrets, SCOPES
-        )
-            .setDataStoreFactory(FileDataStoreFactory(File(applicationContext.filesDir, TOKENS_DIRECTORY_PATH)))
-            .setAccessType("offline")
-            .build()
-        
-        val receiver = LocalServerReceiver.Builder().setPort(8888).build()
-        return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
+    private fun getCredentials(httpTransport: NetHttpTransport): GoogleCredential {
+        val inputStream: InputStream = applicationContext.assets.open("credentials.json")
+        return GoogleCredential.fromStream(inputStream, httpTransport, JSON_FACTORY)
+            .createScoped(SCOPES)
     }
 
     private fun getSheetsService(): Sheets {

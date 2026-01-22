@@ -1,46 +1,44 @@
 # Configuración de la Aplicación Android Nativa
 
-## 1. Google Sheets API
+## ✅ Configuración Automática Completada
 
-### Paso 1: Crear credenciales
+Las siguientes configuraciones ya están aplicadas en el código:
+
+### 1. Gemini API ✅
+- **API Key configurada**: Ya está configurada en `GeminiRepository.kt`
+- **Modelo**: `gemini-pro`
+- No necesitas hacer nada adicional para Gemini
+
+### 2. Google Sheets ✅
+- **SPREADSHEET_ID configurado**: `17EBvx8s1IsxcV9-RigMxYvUxgz15ZA6yIuHyY9f8xGk`
+- **Categorías por defecto**: Vivienda, Transporte, Comida, Seguros, Ahorro, Ingresos, Otros
+
+## 🔧 Solo Falta: Credenciales de Service Account
+
+Para que la app pueda leer y escribir en Google Sheets, necesitas:
+
+### Paso 1: Obtener Credenciales de Service Account
+
+**Sigue la guía detallada**: `OBTENER_CREDENCIALES_SERVICE_ACCOUNT.md`
+
+Resumen rápido:
 1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un nuevo proyecto o selecciona uno existente
-3. Habilita la **Google Sheets API**
-4. Ve a **APIs & Services > Credentials**
-5. Crea credenciales de tipo **Service Account**
-6. Descarga el archivo JSON de credenciales
+2. Crea un proyecto y habilita **Google Sheets API**
+3. Crea una **Service Account**
+4. Descarga el archivo JSON de credenciales
+5. Renómbralo a `credentials.json`
+6. Colócalo en: `android-app/app/src/main/assets/credentials.json`
 
-### Paso 2: Configurar en la app
-1. Coloca el archivo JSON en: `app/src/main/assets/credentials.json`
-2. Abre `GoogleSheetsRepository.kt`
-3. Cambia `SPREADSHEET_ID` por el ID de tu hoja de cálculo
-   - El ID está en la URL: `https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit`
+### Paso 2: Compartir la Hoja con el Service Account
 
-### Paso 3: Compartir hoja con Service Account
-1. Abre tu hoja de Google Sheets
-2. Haz clic en **Compartir**
-3. Agrega el email del Service Account (está en el JSON)
-4. Dale permisos de **Editor**
-
-## 2. Gemini API
-
-### Opción A: Desde la app (Recomendado)
-1. Abre la app
-2. Ve a **⚙️ Config**
-3. Ingresa tu API key de Gemini
-4. Se guardará automáticamente
-
-### Opción B: Hardcodear temporalmente
-1. Abre `GeminiRepository.kt`
-2. En el método `initialize()`, puedes hardcodear la API key temporalmente:
-   ```kotlin
-   fun initialize(apiKey: String = "TU_API_KEY_AQUI") {
-       model = generativeModel(
-           modelName = "gemini-pro",
-           apiKey = apiKey.ifEmpty { "TU_API_KEY_AQUI" }
-       )
-   }
-   ```
+1. Abre el archivo JSON descargado
+2. Busca el campo **"client_email"** (algo como `...@...iam.gserviceaccount.com`)
+3. Copia ese email
+4. Abre tu hoja: https://docs.google.com/spreadsheets/d/17EBvx8s1IsxcV9-RigMxYvUxgz15ZA6yIuHyY9f8xGk/edit
+5. Haz clic en **"Compartir"**
+6. Pega el email del Service Account
+7. Dale permisos de **"Editor"**
+8. Haz clic en **"Compartir"**
 
 ## 3. Compilar la APK
 
