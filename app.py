@@ -333,20 +333,34 @@ st.markdown("""
         border-color: var(--primary) !important;
     }
     
-    /* Modal estilo bottom sheet usando st.dialog */
-    div[data-testid="stDialog"] {
+    /* Modal estilo bottom sheet - Compatible con todas las versiones */
+    .modal-overlay-new {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         background: rgba(0, 0, 0, 0.7) !important;
         backdrop-filter: blur(4px) !important;
+        z-index: 99999 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        padding: 0 1rem 2.5rem 1rem !important;
     }
     
-    div[data-testid="stDialog"] > div {
+    .modal-content-new {
+        width: 100% !important;
+        max-width: 480px !important;
         background: var(--modal-bg) !important;
         border-radius: 0.75rem !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        max-width: 480px !important;
-        width: 95% !important;
-        margin: auto !important;
+        overflow: hidden !important;
         animation: slideInFromBottom 0.3s ease !important;
+        position: relative !important;
+        z-index: 100000 !important;
     }
     
     @keyframes slideInFromBottom {
@@ -360,29 +374,30 @@ st.markdown("""
         }
     }
     
-    /* Ocultar título del dialog */
-    div[data-testid="stDialog"] h2,
-    div[data-testid="stDialog"] h3 {
-        display: none !important;
+    /* Handle del bottom sheet */
+    .modal-handle {
+        height: 24px !important;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding-top: 0.5rem !important;
     }
     
-    /* Formulario dentro del modal */
-    div[data-testid="stDialog"] .stForm {
-        padding: 0.5rem 1.25rem 2rem 1.25rem !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    
-    /* Handle del bottom sheet visual */
-    div[data-testid="stDialog"] > div::before {
+    .modal-handle::before {
         content: '' !important;
-        display: block !important;
         width: 48px !important;
         height: 6px !important;
         background: #3d3f51 !important;
         border-radius: 9999px !important;
-        margin: 0.5rem auto 0 auto !important;
+    }
+    
+    /* Formulario dentro del modal */
+    .modal-content-new .stForm {
+        padding: 0.5rem 1.25rem 2rem 1.25rem !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     
     /* Campo de importe destacado */
@@ -2189,11 +2204,17 @@ if 'modo_simulacion' not in st.session_state:
 
 # El botón de alta está ahora en el header superior
 
-# Modal/Popup para el formulario - Usando st.dialog para mejor compatibilidad
+# Modal/Popup para el formulario - Usando contenedor con CSS (compatible con todas las versiones)
 if st.session_state.show_modal:
-    with st.dialog("Nuevo Movimiento"):
-        # Formulario inteligente y adaptativo - sin título ni X
-        with st.form("form_reg_modal", clear_on_submit=True):
+    # Overlay y contenedor del modal con HTML/CSS
+    st.markdown("""
+    <div class="modal-overlay-new" id="modal-overlay-new">
+        <div class="modal-content-new">
+            <div class="modal-handle"></div>
+    """, unsafe_allow_html=True)
+    
+    # Formulario inteligente y adaptativo - sin título ni X
+    with st.form("form_reg_modal", clear_on_submit=True):
             # Primera fila: Modo Simulación y Tipo
             col_sim, col_tipo = st.columns([1, 2])
             with col_sim:
@@ -2294,10 +2315,13 @@ if st.session_state.show_modal:
                 else:
                     st.error("Faltan datos")
         
-        # Botón para cerrar el modal (fuera del form, dentro del dialog)
-        if st.button("Cerrar", key="close_modal_btn", use_container_width=True):
-            st.session_state.show_modal = False
-            st.rerun()
+    # Botón para cerrar el modal (fuera del form, dentro del modal-content-new)
+    if st.button("Cerrar", key="close_modal_btn", use_container_width=True):
+        st.session_state.show_modal = False
+        st.rerun()
+    
+    # Cerrar divs del modal: modal-content-new y modal-overlay-new
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
 # --- HEADER SUPERIOR CON DISEÑO PERSONALIZADO ---
 titulos_secciones = {
