@@ -31,40 +31,492 @@ st.set_page_config(
     initial_sidebar_state="collapsed"  # Colapsado por defecto
 )
 
-# --- CSS PERSONALIZADO PARA MEJOR DISEÑO Y RESPONSIVE ---
+# --- CSS PERSONALIZADO BASADO EN DISEÑO PROPORCIONADO ---
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-    /* Mejoras generales de diseño */
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+    /* Importar fuente Inter */
+    * {
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
     
-    /* Mejor espaciado en móviles - Optimizado para Chrome Android */
+    /* Variables de color del diseño */
+    :root {
+        --primary: #7980e7;
+        --background-dark: #121320;
+        --background-light: #f6f6f8;
+        --card-bg: rgba(255, 255, 255, 0.05);
+        --card-border: rgba(255, 255, 255, 0.1);
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --text-muted: rgba(255, 255, 255, 0.5);
+        --input-bg: #1d1d26;
+        --input-border: #3d3f51;
+        --modal-bg: #1c1d2b;
+    }
+    
+    /* Fondo general */
+    .stApp {
+        background: var(--background-dark) !important;
+    }
+    
+    .main .block-container {
+        padding-top: 0 !important;
+        padding-bottom: 2rem;
+        max-width: 100% !important;
+    }
+    
+    /* Ocultar header nativo de Streamlit */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    /* Ocultar sidebar completamente */
+    section[data-testid="stSidebar"] {
+        display: none !important;
+    }
+    
+    /* Ocultar botón de toggle sidebar */
+    button[data-testid="baseButton-header"] {
+        display: none !important;
+    }
+    
+    /* Header personalizado estilo glass */
+    .top-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 50 !important;
+        backdrop-filter: blur(10px) !important;
+        background: rgba(18, 19, 32, 0.8) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        padding: 0.75rem 1rem !important;
+        margin: -1rem -1rem 1rem -1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.5rem;
+    }
+    
+    .top-header h2, .top-header h3 {
+        color: white !important;
+        font-size: 1.125rem !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.025em !important;
+    }
+    
+    /* Botón Nuevo estilo primario */
+    .btn-nuevo-header {
+        background: var(--primary) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 0.5rem !important;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.875rem !important;
+        font-weight: 700 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        transition: all 0.2s !important;
+    }
+    
+    .btn-nuevo-header:hover {
+        background: rgba(121, 128, 231, 0.9) !important;
+    }
+    
+    /* Botón menú */
+    .btn-menu-header {
+        color: white !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0.25rem !important;
+    }
+    
+    /* Cards de métricas estilo diseño */
+    [data-testid="stMetricContainer"] {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 0.75rem !important;
+        padding: 1rem !important;
+        min-width: 200px !important;
+    }
+    
+    [data-testid="stMetricValue"] {
+        color: var(--text-primary) !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: var(--text-secondary) !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+    }
+    
+    /* Contenedor de métricas con scroll horizontal */
+    .metrics-scroll-container {
+        overflow-x: auto;
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .metrics-scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Títulos de sección */
+    h2 {
+        color: var(--text-primary) !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.025em !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 1rem !important;
+        padding-left: 1rem !important;
+    }
+    
+    /* Cards de recomendaciones */
+    .recommendation-card {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 0.75rem !important;
+        padding: 1rem !important;
+        display: flex !important;
+        gap: 1rem !important;
+        align-items: flex-start !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .recommendation-icon {
+        padding: 0.5rem !important;
+        border-radius: 0.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .recommendation-content h4 {
+        color: var(--text-primary) !important;
+        font-weight: 700 !important;
+        margin: 0 0 0.25rem 0 !important;
+    }
+    
+    .recommendation-content p {
+        color: var(--text-secondary) !important;
+        font-size: 0.875rem !important;
+        line-height: 1.5 !important;
+        margin: 0 !important;
+    }
+    
+    /* Inputs estilo diseño */
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stDateInput > div > div > input {
+        background: var(--input-bg) !important;
+        border: 1px solid var(--input-border) !important;
+        border-radius: 0.5rem !important;
+        color: var(--text-primary) !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+        min-height: 48px !important;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stNumberInput > div > div > input:focus,
+    .stSelectbox > div > div > select:focus,
+    .stDateInput > div > div > input:focus {
+        border-color: var(--primary) !important;
+        outline: none !important;
+        box-shadow: 0 0 0 1px var(--primary) !important;
+    }
+    
+    .stTextInput > div > div > input::placeholder {
+        color: rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    /* Labels de inputs */
+    label {
+        color: #9fa1b7 !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Botones estilo diseño */
+    .stButton > button {
+        border-radius: 0.75rem !important;
+        font-weight: 700 !important;
+        transition: all 0.2s !important;
+        min-height: 56px !important;
+    }
+    
+    .stButton > button[kind="primary"] {
+        background: var(--primary) !important;
+        color: white !important;
+    }
+    
+    .stButton > button[kind="primary"]:hover {
+        background: rgba(121, 128, 231, 0.9) !important;
+    }
+    
+    .stButton > button:not([kind="primary"]) {
+        background: #2a2b37 !important;
+        color: #9fa1b7 !important;
+    }
+    
+    .stButton > button:not([kind="primary"]):hover {
+        background: #323344 !important;
+    }
+    
+    /* Radio buttons estilo toggle */
+    .stRadio > div {
+        background: #2a2b37 !important;
+        border-radius: 0.5rem !important;
+        padding: 0.25rem !important;
+        display: flex !important;
+        height: 44px !important;
+    }
+    
+    .stRadio > div > label {
+        flex: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem !important;
+        border-radius: 0.5rem !important;
+        color: #9fa1b7 !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+        transition: all 0.2s !important;
+    }
+    
+    .stRadio > div > label:has(input:checked) {
+        background: #121217 !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+    }
+    
+    /* Checkboxes personalizados */
+    .stCheckbox > label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        cursor: pointer !important;
+    }
+    
+    .stCheckbox > label > div:first-child {
+        width: 24px !important;
+        height: 24px !important;
+        border: 2px solid var(--input-border) !important;
+        border-radius: 0.25rem !important;
+        background: transparent !important;
+    }
+    
+    .stCheckbox > label > input:checked + div {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+    }
+    
+    /* Modal estilo bottom sheet */
+    .modal-overlay-new {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.7) !important;
+        backdrop-filter: blur(4px) !important;
+        z-index: 99999 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        padding: 0 1rem 2.5rem 1rem !important;
+    }
+    
+    .modal-content-new {
+        width: 100% !important;
+        max-width: 480px !important;
+        background: var(--modal-bg) !important;
+        border-radius: 0.75rem !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        overflow: hidden !important;
+        animation: slideInFromBottom 0.3s ease !important;
+    }
+    
+    @keyframes slideInFromBottom {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    /* Handle del bottom sheet */
+    .modal-handle {
+        height: 24px !important;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .modal-handle::before {
+        content: '' !important;
+        width: 48px !important;
+        height: 6px !important;
+        background: #3d3f51 !important;
+        border-radius: 9999px !important;
+    }
+    
+    /* Formulario dentro del modal */
+    .modal-content-new .stForm {
+        padding: 0.5rem 1.25rem 2rem 1.25rem !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Campo de importe destacado */
+    .importe-field .stNumberInput > div > div > input {
+        border: 2px solid rgba(121, 128, 231, 0.3) !important;
+        height: 56px !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        text-align: right !important;
+        color: var(--primary) !important;
+    }
+    
+    .importe-field label {
+        color: var(--primary) !important;
+    }
+    
+    /* Gasto conjunto en contenedor especial */
+    .gasto-conjunto-container {
+        background: rgba(42, 43, 55, 0.3) !important;
+        border-radius: 0.5rem !important;
+        padding: 0.25rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    /* Botón cerrar modal */
+    .btn-cerrar-modal {
+        width: 100% !important;
+        max-width: 480px !important;
+        height: 56px !important;
+        background: rgba(239, 68, 68, 0.1) !important;
+        border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        color: #ef4444 !important;
+        font-weight: 700 !important;
+        border-radius: 0.75rem !important;
+        margin-top: 1rem !important;
+        transition: all 0.2s !important;
+    }
+    
+    .btn-cerrar-modal:hover {
+        background: rgba(239, 68, 68, 0.2) !important;
+    }
+    
+    /* Chat messages estilo diseño */
+    .stChatMessage[data-testid="user"] > div {
+        background: var(--primary) !important;
+        border-radius: 1rem 1rem 1rem 0 !important;
+        padding: 0.75rem !important;
+        max-width: 85% !important;
+        margin-left: auto !important;
+    }
+    
+    .stChatMessage[data-testid="assistant"] > div {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 1rem 1rem 0 1rem !important;
+        padding: 0.75rem !important;
+        max-width: 85% !important;
+    }
+    
+    /* Chips de preguntas sugeridas */
+    .suggestion-chip {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 9999px !important;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        font-weight: 500 !important;
+        color: var(--text-secondary) !important;
+        white-space: nowrap !important;
+        transition: all 0.2s !important;
+    }
+    
+    .suggestion-chip:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Scrollbar oculto */
+    .scrollbar-hide {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Móvil optimizaciones */
     @media (max-width: 768px) {
-        /* Contenedor principal más compacto */
         .main .block-container {
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-            padding-top: 0.5rem !important;
-            padding-bottom: 1rem !important;
-            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
         }
         
-        /* Reducir padding del header */
-        header[data-testid="stHeader"] {
-            padding: 0.5rem 0.75rem !important;
+        .top-header {
+            padding: 0.75rem 1rem !important;
         }
         
-        /* Ocultar sidebar completamente */
-        section[data-testid="stSidebar"] {
-            display: none !important;
+        .metrics-scroll-container {
+            padding: 1rem 0.75rem !important;
         }
         
-        /* Ocultar botón de toggle sidebar */
-        button[data-testid="baseButton-header"] {
-            display: none !important;
+        h2 {
+            padding-left: 1rem !important;
         }
+        
+        .recommendation-card {
+            margin-left: 1rem !important;
+            margin-right: 1rem !important;
+        }
+        
+        .modal-overlay-new {
+            padding: 0 0.5rem 1rem 0.5rem !important;
+        }
+        
+        .stTextInput > div > div > input,
+        .stNumberInput > div > div > input,
+        .stSelectbox > div > div > select,
+        .stDateInput > div > div > input {
+            font-size: 16px !important; /* Evita zoom en iOS */
+        }
+    }
         
         /* Contenedor interno de la sidebar */
         section[data-testid="stSidebar"] > div {
@@ -745,6 +1197,266 @@ st.markdown("""
             padding: 0.625rem 1rem;
             font-size: 0.9rem;
         }
+    }
+    
+    /* Estilos adicionales según diseño HTML */
+    
+    /* Métricas con scroll horizontal mejorado */
+    .metrics-horizontal-scroll {
+        overflow-x: auto;
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .metrics-horizontal-scroll::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Cards de métricas individuales estilo diseño */
+    .metric-card {
+        min-width: 200px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+    }
+    
+    .metric-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .metric-card-icon {
+        font-size: 1.25rem;
+    }
+    
+    .metric-card-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .metric-card-value {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    /* Card especial para Acumulado Conjunto */
+    .metric-card-highlight {
+        border: 1px solid rgba(121, 128, 231, 0.3);
+        background: rgba(121, 128, 231, 0.1);
+        padding: 1.5rem;
+        flex: 1;
+    }
+    
+    .metric-card-highlight .metric-card-label {
+        color: var(--primary);
+        font-weight: 600;
+    }
+    
+    .metric-card-highlight .metric-card-value {
+        font-size: 1.875rem;
+        line-height: 1.2;
+    }
+    
+    /* Cards de recomendaciones con iconos */
+    .rec-card-info {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    .rec-card-warning {
+        background: rgba(234, 179, 8, 0.2);
+        color: #fbbf24;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    .rec-card-error {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    /* Análisis de patrones - Barras de progreso */
+    .pattern-bar-container {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        height: 6px;
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+    
+    .pattern-bar-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: 9999px;
+        transition: width 0.3s ease;
+    }
+    
+    /* Gráfico de días de la semana */
+    .day-chart-container {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        height: 96px;
+        gap: 0.5rem;
+    }
+    
+    .day-bar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .day-bar-bg {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 0.125rem 0.125rem 0 0;
+        position: relative;
+    }
+    
+    .day-bar-fill {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(121, 128, 231, 0.4);
+        border-radius: 0.125rem 0.125rem 0 0;
+    }
+    
+    .day-bar-fill.weekend {
+        background: rgba(239, 68, 68, 0.4);
+    }
+    
+    .day-label {
+        font-size: 0.625rem;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .day-label.weekend {
+        color: #f87171;
+        font-weight: 700;
+    }
+    
+    /* Chat container mejorado */
+    .chat-container {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+    
+    .chat-messages-area {
+        padding: 1rem;
+        max-height: 240px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .chat-input-area {
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    
+    .chat-input-wrapper {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.5rem 1rem;
+    }
+    
+    .chat-send-button {
+        background: var(--primary);
+        color: white;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Chips de sugerencias mejorados */
+    .suggestion-chips-container {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding: 1rem 1rem 0 1rem;
+        scrollbar-width: none;
+    }
+    
+    .suggestion-chips-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Selectbox con icono */
+    .stSelectbox > div > div {
+        position: relative;
+    }
+    
+    .stSelectbox > div > div::after {
+        content: 'expand_more';
+        font-family: 'Material Symbols Outlined';
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9fa1b7;
+        pointer-events: none;
+    }
+    
+    /* Date input con icono */
+    .stDateInput > div > div {
+        position: relative;
+    }
+    
+    .stDateInput > div > div::after {
+        content: 'calendar_today';
+        font-family: 'Material Symbols Outlined';
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9fa1b7;
+        pointer-events: none;
+    }
+    
+    /* Frecuencia select con icono */
+    .frecuencia-select::after {
+        content: 'repeat';
+        font-family: 'Material Symbols Outlined';
+    }
+    
+    /* Texto general */
+    body, .stApp {
+        color: white;
+    }
+    
+    p, span, div {
+        color: inherit;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1497,8 +2209,15 @@ if 'modo_simulacion' not in st.session_state:
 
 # El botón de alta está ahora en el header superior
 
-# Modal/Popup para el formulario - Sin título ni X, directo al formulario
+# Modal/Popup para el formulario - Diseño Bottom Sheet
 if st.session_state.show_modal:
+    # Overlay y contenedor del modal
+    st.markdown("""
+    <div class="modal-overlay-new">
+        <div class="modal-content-new">
+            <div class="modal-handle"></div>
+    """, unsafe_allow_html=True)
+    
     # Formulario inteligente y adaptativo - sin título ni X
     with st.form("form_reg_modal", clear_on_submit=True):
         # Primera fila: Modo Simulación y Tipo
@@ -1507,56 +2226,67 @@ if st.session_state.show_modal:
             modo_simulacion = st.checkbox("🧪 Simulación", help="Prueba sin guardar", value=st.session_state.modo_simulacion, key="modo_sim_modal")
             st.session_state.modo_simulacion = modo_simulacion
         with col_tipo:
-            tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True)
+            tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True, label_visibility="collapsed")
+            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Tipo</p>', unsafe_allow_html=True)
         
-        # Segunda fila: Gasto Conjunto
-        es_conjunto = st.checkbox("👥 Gasto Conjunto (Dividir entre 2)", key="es_conjunto_modal")
+        # Segunda fila: Gasto Conjunto en contenedor especial
+        st.markdown('<div class="gasto-conjunto-container">', unsafe_allow_html=True)
+        es_conjunto = st.checkbox("👥 Gasto Conjunto", key="es_conjunto_modal")
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Tercera fila: Fecha y Categoría
         col_fecha, col_cat = st.columns(2)
         with col_fecha:
+            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">📅 Fecha</p>', unsafe_allow_html=True)
             fecha = st.date_input(
-                "📅 Fecha", 
+                "", 
                 datetime.now(), 
                 format="DD/MM/YYYY",
-                key="fecha_input_modal"
+                key="fecha_input_modal",
+                label_visibility="collapsed"
             )
         with col_cat:
-            cat = st.selectbox("Categoría", lista_cats, key="cat_select_modal")
+            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Categoría</p>', unsafe_allow_html=True)
+            cat = st.selectbox("", lista_cats, key="cat_select_modal", label_visibility="collapsed")
         
         # Cuarta fila: Concepto (ancho completo)
-        con = st.text_input("Concepto", key="concepto_input_modal", placeholder="Descripción del movimiento")
+        st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Concepto</p>', unsafe_allow_html=True)
+        con = st.text_input("", key="concepto_input_modal", placeholder="Ej: Cena en terraza", label_visibility="collapsed")
         
-        # Quinta fila: Importe y Frecuencia (Frecuencia visible antes del botón)
+        # Quinta fila: Importe y Frecuencia
         col_imp, col_fre = st.columns([2, 1])
         with col_imp:
+            st.markdown('<p style="color: var(--primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Importe Total (€)</p>', unsafe_allow_html=True)
             imp_input = st.number_input(
-                "Importe Total (€)", 
+                "", 
                 min_value=0.0, 
                 step=0.01, 
                 format="%.2f",
-                key="importe_input_modal"
+                key="importe_input_modal",
+                label_visibility="collapsed"
             )
         with col_fre:
+            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Frecuencia</p>', unsafe_allow_html=True)
             fre = st.selectbox(
-                "Frecuencia", 
+                "", 
                 ["Puntual", "Mensual", "Anual"],
-                key="frecuencia_select_modal"
+                key="frecuencia_select_modal",
+                label_visibility="collapsed"
             )
-        
+    
         # Mostrar cálculo si es conjunto
         imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
         if es_conjunto and tipo == "Gasto" and imp_input > 0:
             st.info(f"ℹ️ Se registrarán **{imp_real:.2f} €** (mitad del total)")
 
         # Botones de acción
-        btn = "➕ Añadir a Simulación" if modo_simulacion else "💾 Guardar"
+        btn = "Guardar / Añadir" if modo_simulacion else "Guardar / Añadir"
         
         col_submit, col_cancel = st.columns([2, 1])
         with col_submit:
             submitted = st.form_submit_button(btn, type="primary", use_container_width=True)
         with col_cancel:
-            if st.form_submit_button("❌ Cancelar", use_container_width=True):
+            if st.form_submit_button("Cancelar", use_container_width=True):
                 st.session_state.show_modal = False
                 st.rerun()
         
@@ -1590,45 +2320,62 @@ if st.session_state.show_modal:
             else:
                 st.error("Faltan datos")
     
-    # Botón para cerrar el modal (fuera del form)
-    if st.button("❌ Cerrar", use_container_width=True, key="close_modal_btn"):
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Botón para cerrar el modal (fuera del form, fuera del contenedor) - Estilo según diseño
+    st.markdown("""
+    <div style="width: 100%; max-width: 480px; margin: 1rem auto 0 auto; padding: 0 0.5rem;">
+        <button onclick="window.parent.postMessage({type: 'streamlit:setFrameHeight', height: 0}, '*');" style="width: 100%; height: 56px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; font-weight: 700; border-radius: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
+            <span class="material-symbols-outlined" style="font-size: 1.25rem;">close</span>
+            Cerrar
+        </button>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if st.button("Cerrar", key="close_modal_btn", use_container_width=True):
         st.session_state.show_modal = False
         st.rerun()
+    
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# --- HEADER SUPERIOR CON BOTÓN DE ALTA Y MENÚ HAMBURGER ---
-col_header_left, col_header_center, col_header_right = st.columns([3, 1, 1])
-with col_header_left:
-    # Título dinámico según sección
-    titulos_secciones = {
-        "🤖 Asesor": "🤖 Asesor Financiero",
-        "📊 Gráficos": "📊 Visualizaciones",
-        "🔍 Tabla": "🔍 Tabla de Movimientos",
-        "🔄 Recurrentes": "🔄 Gastos Recurrentes",
-        "📝 Editar": "📝 Editar Movimientos",
-        "📤 Exportar/Importar": "📤 Exportar / Importar",
-        "💰 Presupuestos": "💰 Presupuestos",
-        "⚙️ Config": "⚙️ Configuración"
-    }
-    titulo_actual = titulos_secciones.get(st.session_state.seccion_actual, "🚀 Finanzas Personales")
-    st.markdown(f"### {titulo_actual}")
+# --- HEADER SUPERIOR CON DISEÑO PERSONALIZADO ---
+titulos_secciones = {
+    "🤖 Asesor": "🤖 Asesor Financiero",
+    "📊 Gráficos": "📊 Visualizaciones",
+    "🔍 Tabla": "🔍 Tabla de Movimientos",
+    "🔄 Recurrentes": "🔄 Gastos Recurrentes",
+    "📝 Editar": "📝 Editar Movimientos",
+    "📤 Exportar/Importar": "📤 Exportar / Importar",
+    "💰 Presupuestos": "💰 Presupuestos",
+    "⚙️ Config": "⚙️ Configuración"
+}
+titulo_actual = titulos_secciones.get(st.session_state.seccion_actual, "Finanzas Proactivas €")
 
-with col_header_center:
-    # Botón de nuevo movimiento más pequeño (no ocupa todo el ancho)
-    if st.button("➕ Nuevo", type="primary", key="btn_alta_header"):
+# Header con diseño glass exacto según HTML
+st.markdown(f"""
+<header class="sticky top-0 z-50 glass border-b border-white/5 px-4 py-3 flex items-center justify-between" style="backdrop-filter: blur(10px); background: rgba(18, 19, 32, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 0.75rem 1rem; margin: -1rem -1rem 1rem -1rem; display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <h2 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.025em;">Finanzas Proactivas €</h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+""", unsafe_allow_html=True)
+
+col_btn1, col_btn2 = st.columns([1, 1])
+with col_btn1:
+    if st.button("➕ Nuevo", type="primary", key="btn_alta_header", use_container_width=True):
         st.session_state.show_modal = True
         st.rerun()
 
-with col_header_right:
-    # Menú hamburger - Usar estado para controlar visibilidad
+with col_btn2:
     if 'menu_abierto' not in st.session_state:
         st.session_state.menu_abierto = False
-    
-    opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
-    
-    # Botón para abrir/cerrar menú
-    if st.button("☰", key="btn_hamburger", help="Menú"):
+    if st.button("☰", key="btn_hamburger", help="Menú", use_container_width=True):
         st.session_state.menu_abierto = not st.session_state.menu_abierto
         st.rerun()
+
+st.markdown("</div></header>", unsafe_allow_html=True)
+
+opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
 
 # Menú lateral derecho con CSS (sin bloquear la app)
 if st.session_state.menu_abierto:
@@ -1703,53 +2450,178 @@ else:
         patrones = analizar_patrones(df)
         recomendaciones = generar_recomendaciones(df, df_presupuestos, patrones)
         
-        # 1. PARTE SUPERIOR: DATOS REALES
-        c1, c2, c3 = st.columns(3)
+        # 1. PARTE SUPERIOR: DATOS REALES - Métricas con scroll horizontal
         ahorro_real = ingresos - gasto_pro
-        with c1:
-            st.metric("Ingresos Mes", f"{ingresos:,.2f} €")
-            st.metric("Gasto Promedio", f"{gasto_pro:,.2f} €")
-            st.metric("Capacidad Ahorro", f"{ahorro_real:,.2f} €")
-        with c2:
-            st.metric("🐷 Hucha Anuales (Mes)", f"{prov_anual:,.2f} €", help="Ahorra esto cada mes")
-            if patrones and 'promedio_mensual' in patrones:
-                st.metric("📊 Promedio Mensual", f"{patrones['promedio_mensual']:,.2f} €")
-        with c3:
-            st.metric("👥 Acumulado Conjunto", f"{total_conjunto:,.2f} €")
+        promedio_mensual = patrones.get('promedio_mensual', 0) if patrones else 0
+        
+        st.markdown("""
+        <div class="metrics-horizontal-scroll">
+            <!-- Columna 1 -->
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <span class="material-symbols-outlined metric-card-icon" style="color: #4ade80;">trending_up</span>
+                    <h3 class="metric-card-label">Ingresos del Mes</h3>
+                </div>
+                <p class="metric-card-value">+€{ingresos:,.0f}</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <span class="material-symbols-outlined metric-card-icon" style="color: var(--primary);">calculate</span>
+                    <h3 class="metric-card-label">Gasto Promedio</h3>
+                </div>
+                <p class="metric-card-value">€{gasto_pro:,.0f}</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-header">
+                    <span class="material-symbols-outlined metric-card-icon" style="color: #4ade80;">savings</span>
+                    <h3 class="metric-card-label">Capacidad Ahorro</h3>
+                </div>
+                <p class="metric-card-value">€{ahorro_real:,.0f}</p>
+            </div>
+            <!-- Columna 2 -->
+            <div class="metric-card" style="height: 100%; justify-content: center;">
+                <div class="metric-card-header">
+                    <span class="material-symbols-outlined metric-card-icon" style="color: var(--primary);">wallet</span>
+                    <h3 class="metric-card-label">Hucha Anual</h3>
+                </div>
+                <p class="metric-card-value">€{prov_anual:,.0f}</p>
+            </div>
+            <div class="metric-card" style="height: 100%; justify-content: center;">
+                <div class="metric-card-header">
+                    <span class="material-symbols-outlined metric-card-icon" style="color: rgba(255,255,255,0.5);">calendar_month</span>
+                    <h3 class="metric-card-label">Promedio Mensual</h3>
+                </div>
+                <p class="metric-card-value">€{promedio_mensual:,.0f}</p>
+            </div>
+            <!-- Columna 3 - Destacada -->
+            <div class="metric-card metric-card-highlight">
+                <p class="metric-card-label">Acumulado Conjunto</p>
+                <p class="metric-card-value">€{total_conjunto:,.0f}</p>
+                <div style="display: flex; align-items: center; gap: 0.25rem; color: #4ade80; font-weight: 700;">
+                    <span class="material-symbols-outlined" style="font-size: 1.125rem;">trending_up</span>
+                    <span>+4.2%</span>
+                </div>
+            </div>
+        </div>
+        """.format(ingresos=ingresos, gasto_pro=gasto_pro, ahorro_real=ahorro_real, prov_anual=prov_anual, promedio_mensual=promedio_mensual, total_conjunto=total_conjunto), unsafe_allow_html=True)
         
         # RECOMENDACIONES INTELIGENTES
         if recomendaciones:
-            st.markdown("---")
-            st.subheader("💡 Recomendaciones Inteligentes")
+            st.markdown("""
+            <div style="padding: 1rem 1rem 0 1rem;">
+                <h2 style="color: white; font-size: 1.25rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                    <span class="material-symbols-outlined" style="color: #fbbf24;">lightbulb</span>
+                    Recomendaciones Inteligentes
+                </h2>
+            </div>
+            <div style="padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            """, unsafe_allow_html=True)
+            
             for rec in recomendaciones[:5]:  # Mostrar máximo 5
-                if rec['tipo'] == 'error':
-                    st.error(rec['mensaje'])
-                elif rec['tipo'] == 'warning':
-                    st.warning(rec['mensaje'])
+                icon_class = "rec-card-info" if rec['tipo'] == 'info' else ("rec-card-warning" if rec['tipo'] == 'warning' else "rec-card-error")
+                icon_symbol = "info" if rec['tipo'] == 'info' else ("warning" if rec['tipo'] == 'warning' else "error")
+                
+                # Extraer título y mensaje del texto
+                mensaje = rec['mensaje']
+                if ':' in mensaje:
+                    partes = mensaje.split(':', 1)
+                    titulo = partes[0].replace('⚠️', '').replace('💡', '').replace('❌', '').strip()
+                    descripcion = partes[1].strip()
                 else:
-                    st.info(rec['mensaje'])
+                    titulo = "Recomendación"
+                    descripcion = mensaje
+                
+                st.markdown(f"""
+                <div class="recommendation-card">
+                    <div class="{icon_class}">
+                        <span class="material-symbols-outlined">{icon_symbol}</span>
+                    </div>
+                    <div class="recommendation-content">
+                        <h4>{titulo}</h4>
+                        <p>{descripcion}</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
         
         # ANÁLISIS DE PATRONES
         if patrones:
-            st.markdown("---")
-            st.subheader("📈 Análisis de Patrones")
+            st.markdown("""
+            <div style="padding: 1.5rem 1rem 0 1rem;">
+                <h2 style="color: white; font-size: 1.25rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                    <span class="material-symbols-outlined" style="color: var(--primary);">analytics</span>
+                    Análisis de Patrones
+                </h2>
+            </div>
+            <div style="padding: 1rem; display: flex; flex-direction: column; gap: 1.5rem;">
+            """, unsafe_allow_html=True)
             
             col_pat1, col_pat2 = st.columns(2)
+            
             with col_pat1:
                 if 'top_categorias' in patrones and patrones['top_categorias']:
-                    st.markdown("**🏆 Top 5 Categorías con Más Gasto:**")
-                    for cat, importe in list(patrones['top_categorias'].items())[:5]:
-                        st.write(f"- {cat}: {importe:,.2f} €")
+                    top_cats = list(patrones['top_categorias'].items())[:5]
+                    total_top = sum([v for _, v in top_cats])
+                    
+                    st.markdown("""
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem;">
+                        <h3 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Top 5 Categorías</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    """, unsafe_allow_html=True)
+                    
+                    for cat, importe in top_cats:
+                        porcentaje = (importe / total_top * 100) if total_top > 0 else 0
+                        st.markdown(f"""
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
+                                <span style="color: white;">{cat}</span>
+                                <span style="color: rgba(255,255,255,0.6);">€{importe:,.0f} ({porcentaje:.0f}%)</span>
+                            </div>
+                            <div class="pattern-bar-container">
+                                <div class="pattern-bar-fill" style="width: {porcentaje}%;"></div>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    st.markdown("</div></div>", unsafe_allow_html=True)
             
             with col_pat2:
                 if 'gastos_por_dia' in patrones and patrones['gastos_por_dia']:
-                    st.markdown("**📅 Gastos por Día de la Semana:**")
                     dias_orden = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-                    dias_es = {'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles', 
+                    dias_es = {'Monday': 'L', 'Tuesday': 'M', 'Wednesday': 'X', 
+                              'Thursday': 'J', 'Friday': 'V', 'Saturday': 'S', 'Sunday': 'D'}
+                    dias_nombres = {'Monday': 'Lunes', 'Tuesday': 'Martes', 'Wednesday': 'Miércoles', 
                               'Thursday': 'Jueves', 'Friday': 'Viernes', 'Saturday': 'Sábado', 'Sunday': 'Domingo'}
+                    
+                    gastos_dias = {d: patrones['gastos_por_dia'].get(d, 0) for d in dias_orden}
+                    max_gasto = max(gastos_dias.values()) if gastos_dias.values() else 1
+                    
+                    st.markdown("""
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem;">
+                        <h3 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Gastos por día</h3>
+                        <div class="day-chart-container">
+                    """, unsafe_allow_html=True)
+                    
                     for dia in dias_orden:
-                        if dia in patrones['gastos_por_dia']:
-                            st.write(f"- {dias_es.get(dia, dia)}: {patrones['gastos_por_dia'][dia]:,.2f} €")
+                        gasto = gastos_dias[dia]
+                        altura_pct = (gasto / max_gasto * 100) if max_gasto > 0 else 0
+                        altura_base = 48 + (altura_pct / 100 * 48)  # Entre 48px y 96px
+                        es_finde = dia in ['Friday', 'Saturday']
+                        clase_weekend = "weekend" if es_finde else ""
+                        
+                        st.markdown(f"""
+                        <div class="day-bar">
+                            <div class="day-bar-bg" style="height: {altura_base}px;">
+                                <div class="day-bar-fill {clase_weekend}" style="height: {altura_pct}%;"></div>
+                            </div>
+                            <span class="day-label {clase_weekend}">{dias_es[dia]}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    st.markdown("</div></div>", unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
         
         # 2. CHAT CON GEMINI AI
         st.markdown("---")
