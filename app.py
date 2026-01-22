@@ -333,31 +333,19 @@ st.markdown("""
         border-color: var(--primary) !important;
     }
     
-    /* Modal estilo bottom sheet */
-    .modal-overlay-new {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
+    /* Modal estilo bottom sheet usando st.dialog */
+    div[data-testid="stDialog"] {
         background: rgba(0, 0, 0, 0.7) !important;
         backdrop-filter: blur(4px) !important;
-        z-index: 99999 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: flex-end !important;
-        align-items: center !important;
-        padding: 0 1rem 2.5rem 1rem !important;
     }
     
-    .modal-content-new {
-        width: 100% !important;
-        max-width: 480px !important;
+    div[data-testid="stDialog"] > div {
         background: var(--modal-bg) !important;
         border-radius: 0.75rem !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        overflow: hidden !important;
+        max-width: 480px !important;
+        width: 95% !important;
+        margin: auto !important;
         animation: slideInFromBottom 0.3s ease !important;
     }
     
@@ -372,29 +360,29 @@ st.markdown("""
         }
     }
     
-    /* Handle del bottom sheet */
-    .modal-handle {
-        height: 24px !important;
-        width: 100% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    
-    .modal-handle::before {
-        content: '' !important;
-        width: 48px !important;
-        height: 6px !important;
-        background: #3d3f51 !important;
-        border-radius: 9999px !important;
+    /* Ocultar título del dialog */
+    div[data-testid="stDialog"] h2,
+    div[data-testid="stDialog"] h3 {
+        display: none !important;
     }
     
     /* Formulario dentro del modal */
-    .modal-content-new .stForm {
+    div[data-testid="stDialog"] .stForm {
         padding: 0.5rem 1.25rem 2rem 1.25rem !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+    }
+    
+    /* Handle del bottom sheet visual */
+    div[data-testid="stDialog"] > div::before {
+        content: '' !important;
+        display: block !important;
+        width: 48px !important;
+        height: 6px !important;
+        background: #3d3f51 !important;
+        border-radius: 9999px !important;
+        margin: 0.5rem auto 0 auto !important;
     }
     
     /* Campo de importe destacado */
@@ -1201,24 +1189,8 @@ st.markdown("""
     
     /* Estilos adicionales según diseño HTML */
     
-    /* Métricas con scroll horizontal mejorado */
-    .metrics-horizontal-scroll {
-        overflow-x: auto;
-        display: flex;
-        gap: 1rem;
-        padding: 1rem;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    
-    .metrics-horizontal-scroll::-webkit-scrollbar {
-        display: none;
-    }
-    
     /* Cards de métricas individuales estilo diseño */
     .metric-card {
-        min-width: 200px;
-        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
@@ -1226,6 +1198,14 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.1);
         background: rgba(255, 255, 255, 0.05);
         padding: 1rem;
+        margin-bottom: 0.75rem;
+        min-height: 120px;
+    }
+    
+    /* Asegurar que las métricas se vean bien en columnas */
+    .stColumn {
+        display: flex;
+        flex-direction: column;
     }
     
     .metric-card-header {
@@ -2209,134 +2189,115 @@ if 'modo_simulacion' not in st.session_state:
 
 # El botón de alta está ahora en el header superior
 
-# Modal/Popup para el formulario - Diseño Bottom Sheet
+# Modal/Popup para el formulario - Usando st.dialog para mejor compatibilidad
 if st.session_state.show_modal:
-    # Overlay y contenedor del modal
-    st.markdown("""
-    <div class="modal-overlay-new">
-        <div class="modal-content-new">
-            <div class="modal-handle"></div>
-    """, unsafe_allow_html=True)
-    
-    # Formulario inteligente y adaptativo - sin título ni X
-    with st.form("form_reg_modal", clear_on_submit=True):
-        # Primera fila: Modo Simulación y Tipo
-        col_sim, col_tipo = st.columns([1, 2])
-        with col_sim:
-            modo_simulacion = st.checkbox("🧪 Simulación", help="Prueba sin guardar", value=st.session_state.modo_simulacion, key="modo_sim_modal")
-            st.session_state.modo_simulacion = modo_simulacion
-        with col_tipo:
-            tipo = st.radio("Tipo", ["Ingreso", "Gasto"], index=1, horizontal=True, label_visibility="collapsed")
-            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Tipo</p>', unsafe_allow_html=True)
+    with st.dialog("Nuevo Movimiento"):
+        # Formulario inteligente y adaptativo - sin título ni X
+        with st.form("form_reg_modal", clear_on_submit=True):
+            # Primera fila: Modo Simulación y Tipo
+            col_sim, col_tipo = st.columns([1, 2])
+            with col_sim:
+                modo_simulacion = st.checkbox("🧪 Simulación", help="Prueba sin guardar", value=st.session_state.modo_simulacion, key="modo_sim_modal")
+                st.session_state.modo_simulacion = modo_simulacion
+            with col_tipo:
+                st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Tipo</p>', unsafe_allow_html=True)
+                tipo = st.radio("", ["Ingreso", "Gasto"], index=1, horizontal=True, label_visibility="collapsed")
+            
+            # Segunda fila: Gasto Conjunto en contenedor especial
+            st.markdown('<div class="gasto-conjunto-container">', unsafe_allow_html=True)
+            es_conjunto = st.checkbox("👥 Gasto Conjunto", key="es_conjunto_modal")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Tercera fila: Fecha y Categoría
+            col_fecha, col_cat = st.columns(2)
+            with col_fecha:
+                st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">📅 Fecha</p>', unsafe_allow_html=True)
+                fecha = st.date_input(
+                    "", 
+                    datetime.now(), 
+                    format="DD/MM/YYYY",
+                    key="fecha_input_modal",
+                    label_visibility="collapsed"
+                )
+            with col_cat:
+                st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Categoría</p>', unsafe_allow_html=True)
+                cat = st.selectbox("", lista_cats, key="cat_select_modal", label_visibility="collapsed")
+            
+            # Cuarta fila: Concepto (ancho completo)
+            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Concepto</p>', unsafe_allow_html=True)
+            con = st.text_input("", key="concepto_input_modal", placeholder="Ej: Cena en terraza", label_visibility="collapsed")
+            
+            # Quinta fila: Importe y Frecuencia
+            col_imp, col_fre = st.columns([2, 1])
+            with col_imp:
+                st.markdown('<p style="color: var(--primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Importe Total (€)</p>', unsafe_allow_html=True)
+                imp_input = st.number_input(
+                    "", 
+                    min_value=0.0, 
+                    step=0.01, 
+                    format="%.2f",
+                    key="importe_input_modal",
+                    label_visibility="collapsed"
+                )
+            with col_fre:
+                st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Frecuencia</p>', unsafe_allow_html=True)
+                fre = st.selectbox(
+                    "", 
+                    ["Puntual", "Mensual", "Anual"],
+                    key="frecuencia_select_modal",
+                    label_visibility="collapsed"
+                )
         
-        # Segunda fila: Gasto Conjunto en contenedor especial
-        st.markdown('<div class="gasto-conjunto-container">', unsafe_allow_html=True)
-        es_conjunto = st.checkbox("👥 Gasto Conjunto", key="es_conjunto_modal")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Tercera fila: Fecha y Categoría
-        col_fecha, col_cat = st.columns(2)
-        with col_fecha:
-            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">📅 Fecha</p>', unsafe_allow_html=True)
-            fecha = st.date_input(
-                "", 
-                datetime.now(), 
-                format="DD/MM/YYYY",
-                key="fecha_input_modal",
-                label_visibility="collapsed"
-            )
-        with col_cat:
-            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Categoría</p>', unsafe_allow_html=True)
-            cat = st.selectbox("", lista_cats, key="cat_select_modal", label_visibility="collapsed")
-        
-        # Cuarta fila: Concepto (ancho completo)
-        st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Concepto</p>', unsafe_allow_html=True)
-        con = st.text_input("", key="concepto_input_modal", placeholder="Ej: Cena en terraza", label_visibility="collapsed")
-        
-        # Quinta fila: Importe y Frecuencia
-        col_imp, col_fre = st.columns([2, 1])
-        with col_imp:
-            st.markdown('<p style="color: var(--primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Importe Total (€)</p>', unsafe_allow_html=True)
-            imp_input = st.number_input(
-                "", 
-                min_value=0.0, 
-                step=0.01, 
-                format="%.2f",
-                key="importe_input_modal",
-                label_visibility="collapsed"
-            )
-        with col_fre:
-            st.markdown('<p style="color: #9fa1b7; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Frecuencia</p>', unsafe_allow_html=True)
-            fre = st.selectbox(
-                "", 
-                ["Puntual", "Mensual", "Anual"],
-                key="frecuencia_select_modal",
-                label_visibility="collapsed"
-            )
-    
-        # Mostrar cálculo si es conjunto
-        imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
-        if es_conjunto and tipo == "Gasto" and imp_input > 0:
-            st.info(f"ℹ️ Se registrarán **{imp_real:.2f} €** (mitad del total)")
+            # Mostrar cálculo si es conjunto
+            imp_real = imp_input / 2 if es_conjunto and tipo == "Gasto" else imp_input
+            if es_conjunto and tipo == "Gasto" and imp_input > 0:
+                st.info(f"ℹ️ Se registrarán **{imp_real:.2f} €** (mitad del total)")
 
-        # Botones de acción
-        btn = "Guardar / Añadir" if modo_simulacion else "Guardar / Añadir"
-        
-        col_submit, col_cancel = st.columns([2, 1])
-        with col_submit:
-            submitted = st.form_submit_button(btn, type="primary", use_container_width=True)
-        with col_cancel:
-            if st.form_submit_button("Cancelar", use_container_width=True):
-                st.session_state.show_modal = False
-                st.rerun()
-        
-        if submitted:
-            if imp_input > 0 and con:
-                impacto = imp_real / 12 if fre == "Anual" else imp_real
-                
-                if modo_simulacion:
-                    # LÓGICA DE SIMULACIÓN CORREGIDA
-                    st.session_state.simulacion.append({
-                        "Fecha": fecha.strftime("%d/%m/%Y"), 
-                        "Tipo": tipo, 
-                        "Concepto": f"{con} (Sim)",
-                        "Importe": imp_real, 
-                        "Frecuencia": fre, 
-                        "Impacto_Mensual": impacto, 
-                        "Es_Conjunto": es_conjunto
-                    })
+            # Botones de acción
+            btn = "➕ Añadir a Simulación" if modo_simulacion else "💾 Guardar"
+            
+            col_submit, col_cancel = st.columns([2, 1])
+            with col_submit:
+                submitted = st.form_submit_button(btn, type="primary", use_container_width=True)
+            with col_cancel:
+                if st.form_submit_button("Cancelar", use_container_width=True):
                     st.session_state.show_modal = False
-                    st.success("Añadido a simulación")
                     st.rerun()
+            
+            if submitted:
+                if imp_input > 0 and con:
+                    impacto = imp_real / 12 if fre == "Anual" else imp_real
+                    
+                    if modo_simulacion:
+                        # LÓGICA DE SIMULACIÓN CORREGIDA
+                        st.session_state.simulacion.append({
+                            "Fecha": fecha.strftime("%d/%m/%Y"), 
+                            "Tipo": tipo, 
+                            "Concepto": f"{con} (Sim)",
+                            "Importe": imp_real, 
+                            "Frecuencia": fre, 
+                            "Impacto_Mensual": impacto, 
+                            "Es_Conjunto": es_conjunto
+                        })
+                        st.session_state.show_modal = False
+                        st.success("Añadido a simulación")
+                        st.rerun()
+                    else:
+                        # LÓGICA DE GUARDADO REAL
+                        new_row = pd.DataFrame([[pd.to_datetime(fecha), tipo, cat, con, imp_real, fre, impacto, es_conjunto]], columns=COLUMNS)
+                        df = pd.concat([df, new_row], ignore_index=True)
+                        save_all_data(df)
+                        registrar_cambio("Alta", f"Nuevo movimiento: {con} ({imp_real:.2f} €)")
+                        st.session_state.show_modal = False
+                        st.success("Guardado")
+                        st.rerun()
                 else:
-                    # LÓGICA DE GUARDADO REAL
-                    new_row = pd.DataFrame([[pd.to_datetime(fecha), tipo, cat, con, imp_real, fre, impacto, es_conjunto]], columns=COLUMNS)
-                    df = pd.concat([df, new_row], ignore_index=True)
-                    save_all_data(df)
-                    registrar_cambio("Alta", f"Nuevo movimiento: {con} ({imp_real:.2f} €)")
-                    st.session_state.show_modal = False
-                    st.success("Guardado")
-                    st.rerun()
-            else:
-                st.error("Faltan datos")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Botón para cerrar el modal (fuera del form, fuera del contenedor) - Estilo según diseño
-    st.markdown("""
-    <div style="width: 100%; max-width: 480px; margin: 1rem auto 0 auto; padding: 0 0.5rem;">
-        <button onclick="window.parent.postMessage({type: 'streamlit:setFrameHeight', height: 0}, '*');" style="width: 100%; height: 56px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; font-weight: 700; border-radius: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
-            <span class="material-symbols-outlined" style="font-size: 1.25rem;">close</span>
-            Cerrar
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("Cerrar", key="close_modal_btn", use_container_width=True):
-        st.session_state.show_modal = False
-        st.rerun()
-    
-    st.markdown("</div>", unsafe_allow_html=True)
+                    st.error("Faltan datos")
+        
+        # Botón para cerrar el modal (fuera del form, dentro del dialog)
+        if st.button("Cerrar", key="close_modal_btn", use_container_width=True):
+            st.session_state.show_modal = False
+            st.rerun()
 
 # --- HEADER SUPERIOR CON DISEÑO PERSONALIZADO ---
 titulos_secciones = {
@@ -2377,37 +2338,49 @@ st.markdown("</div></header>", unsafe_allow_html=True)
 
 opciones_menu = ["🤖 Asesor", "📊 Gráficos", "🔍 Tabla", "🔄 Recurrentes", "📝 Editar", "📤 Exportar/Importar", "💰 Presupuestos", "⚙️ Config"]
 
-# Menú lateral derecho con CSS (sin bloquear la app)
+# Menú lateral derecho - Usando sidebar temporal
 if st.session_state.menu_abierto:
-    # Crear menú lateral derecho con contenedor de Streamlit
+    # CSS para mostrar sidebar desde la derecha
     st.markdown("""
     <style>
-    div[data-testid="stContainer"]:has(button[key="btn_cerrar_menu"]) {
+    section[data-testid="stSidebar"] {
+        display: block !important;
         position: fixed !important;
-        top: 0 !important;
         right: 0 !important;
+        left: auto !important;
+        top: 0 !important;
         width: 280px !important;
-        height: 100vh !important;
-        background: var(--background-color) !important;
-        box-shadow: -2px 0 10px rgba(0,0,0,0.3) !important;
         z-index: 99999 !important;
-        padding: 1rem !important;
-        overflow-y: auto !important;
         animation: slideInRight 0.3s ease !important;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.3) !important;
     }
+    
     @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-        }
-        to {
-            transform: translateX(0);
-        }
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+    }
+    
+    /* Overlay oscuro cuando el menú está abierto */
+    .main::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99998;
+        animation: fadeIn 0.2s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     </style>
     """, unsafe_allow_html=True)
     
-    # Contenedor para el menú lateral derecho
-    with st.container():
+    with st.sidebar:
         st.markdown("### Navegación")
         
         # Botón para cerrar menú
@@ -2421,8 +2394,20 @@ if st.session_state.menu_abierto:
         for opcion in opciones_menu:
             if st.button(opcion, use_container_width=True, key=f"menu_btn_{opcion}"):
                 st.session_state.seccion_actual = opcion
-                st.session_state.menu_abierto = False  # IMPORTANTE: Cerrar menú al seleccionar
+                st.session_state.menu_abierto = False
                 st.rerun()
+else:
+    # Asegurar que la sidebar esté oculta cuando el menú está cerrado
+    st.markdown("""
+    <style>
+    section[data-testid="stSidebar"] {
+        display: none !important;
+    }
+    .main::before {
+        display: none !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # --- DASHBOARD ---
 if df.empty: 
@@ -2454,9 +2439,11 @@ else:
         ahorro_real = ingresos - gasto_pro
         promedio_mensual = patrones.get('promedio_mensual', 0) if patrones else 0
         
-        st.markdown("""
-        <div class="metrics-horizontal-scroll">
-            <!-- Columna 1 -->
+        # Métricas en grid responsive - Todas visibles sin scroll
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="material-symbols-outlined metric-card-icon" style="color: #4ade80;">trending_up</span>
@@ -2464,6 +2451,9 @@ else:
                 </div>
                 <p class="metric-card-value">+€{ingresos:,.0f}</p>
             </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="material-symbols-outlined metric-card-icon" style="color: var(--primary);">calculate</span>
@@ -2471,6 +2461,9 @@ else:
                 </div>
                 <p class="metric-card-value">€{gasto_pro:,.0f}</p>
             </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
             <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="material-symbols-outlined metric-card-icon" style="color: #4ade80;">savings</span>
@@ -2478,22 +2471,31 @@ else:
                 </div>
                 <p class="metric-card-value">€{ahorro_real:,.0f}</p>
             </div>
-            <!-- Columna 2 -->
-            <div class="metric-card" style="height: 100%; justify-content: center;">
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown(f"""
+            <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="material-symbols-outlined metric-card-icon" style="color: var(--primary);">wallet</span>
                     <h3 class="metric-card-label">Hucha Anual</h3>
                 </div>
                 <p class="metric-card-value">€{prov_anual:,.0f}</p>
             </div>
-            <div class="metric-card" style="height: 100%; justify-content: center;">
+            """, unsafe_allow_html=True)
+            
+            st.markdown(f"""
+            <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="material-symbols-outlined metric-card-icon" style="color: rgba(255,255,255,0.5);">calendar_month</span>
                     <h3 class="metric-card-label">Promedio Mensual</h3>
                 </div>
                 <p class="metric-card-value">€{promedio_mensual:,.0f}</p>
             </div>
-            <!-- Columna 3 - Destacada -->
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown(f"""
             <div class="metric-card metric-card-highlight">
                 <p class="metric-card-label">Acumulado Conjunto</p>
                 <p class="metric-card-value">€{total_conjunto:,.0f}</p>
@@ -2502,8 +2504,7 @@ else:
                     <span>+4.2%</span>
                 </div>
             </div>
-        </div>
-        """.format(ingresos=ingresos, gasto_pro=gasto_pro, ahorro_real=ahorro_real, prov_anual=prov_anual, promedio_mensual=promedio_mensual, total_conjunto=total_conjunto), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         # RECOMENDACIONES INTELIGENTES
         if recomendaciones:
