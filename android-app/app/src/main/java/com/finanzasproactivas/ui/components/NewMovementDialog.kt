@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.finanzasproactivas.data.model.*
 import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,8 +90,9 @@ fun NewMovementDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     OutlinedTextField(
-                        value = fecha.toString(),
+                        value = dateFormat.format(fecha),
                         onValueChange = {},
                         label = { Text("📅 Fecha") },
                         readOnly = true,
@@ -143,9 +146,11 @@ fun NewMovementDialog(
                             label = { Text("Frecuencia") },
                             readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = { expanded = true },
+                            readOnly = true,
                             trailingIcon = {
-                                Icon(Icons.Default.ArrowDropDown, null)
+                                IconButton(onClick = { expanded = true }) {
+                                    Icon(Icons.Default.ArrowDropDown, null)
+                                }
                             }
                         )
                         DropdownMenu(
