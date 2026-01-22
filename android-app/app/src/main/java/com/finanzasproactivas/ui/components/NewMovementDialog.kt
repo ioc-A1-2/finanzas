@@ -170,11 +170,10 @@ fun NewMovementDialog(
                                 Frecuencia.MENSUAL -> "Mensual"
                                 Frecuencia.ANUAL -> "Anual"
                             },
-                            onValueChange = {},
+                            onValueChange = { },
                             label = { Text("Frecuencia") },
                             readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
-                            readOnly = true,
                             trailingIcon = {
                                 IconButton(onClick = { expanded = true }) {
                                     Icon(Icons.Default.ArrowDropDown, null)

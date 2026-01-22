@@ -3,6 +3,7 @@ package com.finanzasproactivas.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -144,6 +145,7 @@ fun ChatBubble(mensaje: ChatMessage) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuggestionChip(texto: String, onClick: (String) -> Unit) {
     FilterChip(

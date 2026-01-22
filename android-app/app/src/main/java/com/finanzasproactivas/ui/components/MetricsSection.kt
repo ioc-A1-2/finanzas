@@ -1,5 +1,6 @@
 package com.finanzasproactivas.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
@@ -90,10 +91,9 @@ fun MetricCard(
         colors = CardDefaults.cardColors(
             containerColor = CardBg
         ),
-        border = CardDefaults.outlinedCardBorder(enabled = true).copy(
-            brush = null,
+        border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
-            shape = MaterialTheme.shapes.medium
+            color = CardBorder
         )
     ) {
         Column(
@@ -141,10 +141,9 @@ fun MetricCardHighlight(
         colors = CardDefaults.cardColors(
             containerColor = Primary.copy(alpha = 0.1f)
         ),
-        border = CardDefaults.outlinedCardBorder(enabled = true).copy(
-            brush = null,
+        border = androidx.compose.foundation.BorderStroke(
             width = 1.dp,
-            shape = MaterialTheme.shapes.medium
+            color = CardBorder
         )
     ) {
         Column(

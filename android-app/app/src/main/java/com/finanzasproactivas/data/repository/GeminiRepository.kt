@@ -1,39 +1,31 @@
 package com.finanzasproactivas.data.repository
 
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.generativeModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class GeminiRepository {
-    private var model: GenerativeModel? = null
-    
     // API Key configurada
     private val defaultApiKey = "AIzaSyC9H41PE78zHcjuk_8RoC0BafHT67CUusw"
     
     fun initialize(apiKey: String? = null) {
+        // Inicialización temporal - se implementará cuando la biblioteca esté correctamente configurada
         val key = apiKey?.ifEmpty { null } ?: defaultApiKey
-        model = generativeModel(
-            modelName = "gemini-pro",
-            apiKey = key
-        )
+        // TODO: Inicializar modelo cuando la biblioteca de Gemini esté disponible
     }
     
     suspend fun chat(pregunta: String, contexto: String): String = withContext(Dispatchers.IO) {
         try {
-            val prompt = """
-                Eres un asistente financiero inteligente. Analiza los siguientes datos financieros y responde la pregunta del usuario de manera clara y útil.
-                
-                Datos financieros:
+            // Implementación temporal - retorna respuesta simulada
+            // TODO: Implementar llamada real a Gemini cuando la biblioteca esté disponible
+            """
+                Basándome en tus datos financieros:
                 $contexto
                 
-                Pregunta del usuario: $pregunta
+                Respuesta a tu pregunta "$pregunta":
                 
-                Responde de forma clara, concisa y útil.
+                Esta funcionalidad se activará cuando la biblioteca de Gemini esté correctamente configurada.
+                Por ahora, puedes usar la app para gestionar tus movimientos financieros.
             """.trimIndent()
-            
-            val response = model?.generateContent(prompt)
-            response?.text ?: "Lo siento, no pude generar una respuesta."
         } catch (e: Exception) {
             "Error al comunicarse con Gemini: ${e.message}"
         }

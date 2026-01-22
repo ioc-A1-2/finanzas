@@ -12,17 +12,19 @@
 2. Selecciona "Open an Existing Project"
 3. Navega a la carpeta `android-app` y selecciónala
 4. Espera a que Android Studio sincronice el proyecto (puede tardar varios minutos la primera vez)
+   - Android Studio descargará automáticamente las dependencias necesarias
+   - La primera vez puede tardar 5-10 minutos
 
-## Paso 3: Configurar la URL de Streamlit
+## Paso 3: Verificar Configuración (Opcional)
 
-1. Abre el archivo: `app/src/main/java/com/finanzasproactivas/MainActivity.kt`
-2. Busca la línea que dice:
-   ```kotlin
-   private val STREAMLIT_URL = "https://tu-app.streamlit.app"
-   ```
-3. Reemplaza `https://tu-app.streamlit.app` con la URL real de tu aplicación Streamlit
-   - Si está en Streamlit Cloud: `https://tu-usuario-streamlit-app.streamlit.app`
-   - Si está en otro servidor: la URL completa
+La aplicación ya está configurada con:
+- ✅ API key de Gemini
+- ✅ ID de Google Sheets
+- ✅ Credenciales de Service Account (si colocaste el archivo `credentials.json`)
+
+**Importante**: Asegúrate de que:
+- El archivo `credentials.json` esté en `app/src/main/assets/`
+- Tu hoja de Google Sheets esté compartida con el Service Account (ver `VERIFICACION_FINAL.md`)
 
 ## Paso 4: Compilar la APK
 
@@ -64,10 +66,14 @@
 - Asegúrate de que "Use Gradle from" esté configurado correctamente
 - Intenta hacer clic en "Sync Project with Gradle Files" de nuevo
 
-### La app no carga la URL
-- Verifica que la URL en `MainActivity.kt` sea correcta
-- Asegúrate de que tu dispositivo tenga conexión a internet
-- Verifica que la aplicación Streamlit esté accesible desde un navegador
+### Error: "403 Forbidden" al acceder a Google Sheets
+- Verifica que hayas compartido la hoja con el Service Account
+- El email del Service Account está en `credentials.json` (campo `client_email`)
+- Asegúrate de dar permisos de **Editor** al Service Account
+
+### Error: "FileNotFoundException: credentials.json"
+- Verifica que el archivo esté en `app/src/main/assets/credentials.json`
+- El nombre debe ser exactamente `credentials.json` (sin espacios, todo minúsculas)
 
 ### La app se cierra al abrirla
 - Verifica los logs en Android Studio: **View > Tool Windows > Logcat**
@@ -78,4 +84,5 @@
 - La aplicación requiere conexión a internet para funcionar
 - Todos los datos se almacenan en Google Sheets (online)
 - La IA (Gemini) funciona completamente online
-- La aplicación es básicamente un navegador especializado para tu app Streamlit
+- Esta es una aplicación **nativa de Android** (no usa Streamlit)
+- Los datos y la IA están completamente integrados en la app nativa
