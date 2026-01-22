@@ -1,4 +1,4 @@
-#Thu Jan 22 15:22:00 CET 2026
+#Thu Jan 22 15:28:05 CET 2026
 base.0=C\:\\Users\\Luci\\Documents\\finanzas\\android-app\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=C\:\\Users\\Luci\\Documents\\finanzas\\android-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
 base.2=C\:\\Users\\Luci\\Documents\\finanzas\\android-app\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex

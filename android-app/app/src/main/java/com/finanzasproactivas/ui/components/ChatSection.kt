@@ -10,12 +10,31 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.finanzasproactivas.data.repository.GeminiRepository
 import com.finanzasproactivas.ui.theme.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatSection() {
     var pregunta by remember { mutableStateOf("") }
     var mensajes by remember { mutableStateOf<List<ChatMessage>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(false) }
+    
+    // Inicializar GeminiRepository
+    val geminiRepo = remember { GeminiRepository().apply { initialize() } }
+    val scope = rememberCoroutineScope()
+    
+    // Contexto financiero (por ahora datos de ejemplo, luego se conectarán con Google Sheets)
+    val contextoFinanciero = remember {
+        """
+        Resumen financiero del mes actual:
+        - Ingresos totales: €2,500.00
+        - Gastos totales: €1,200.00
+        - Ahorro disponible: €1,300.00
+        - Categorías principales: Vivienda, Transporte, Comida
+        - Promedio diario de gastos: €40.00
+        """.trimIndent()
+    }
     
     Column(
         modifier = Modifier
@@ -97,19 +116,49 @@ fun ChatSection() {
                         modifier = Modifier.weight(1f),
                         placeholder = { Text("Pregunta a Gemini...") },
                         trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    if (pregunta.isNotEmpty()) {
-                                        mensajes = mensajes + ChatMessage(
-                                            texto = pregunta,
-                                            esUsuario = true
-                                        )
-                                        // Aquí se llamaría a Gemini
-                                        pregunta = ""
-                                    }
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = Primary
+                                )
+                            } else {
+                                IconButton(
+                                    onClick = {
+                                        if (pregunta.isNotEmpty() && !isLoading) {
+                                            val preguntaActual = pregunta
+                                            mensajes = mensajes + ChatMessage(
+                                                texto = preguntaActual,
+                                                esUsuario = true
+                                            )
+                                            pregunta = ""
+                                            isLoading = true
+                                            
+                                            // Llamar a Gemini
+                                            scope.launch {
+                                                try {
+                                                    val respuesta = geminiRepo.chat(
+                                                        pregunta = preguntaActual,
+                                                        contexto = contextoFinanciero
+                                                    )
+                                                    mensajes = mensajes + ChatMessage(
+                                                        texto = respuesta,
+                                                        esUsuario = false
+                                                    )
+                                                } catch (e: Exception) {
+                                                    mensajes = mensajes + ChatMessage(
+                                                        texto = "Error: ${e.message ?: "No se pudo obtener respuesta"}",
+                                                        esUsuario = false
+                                                    )
+                                                } finally {
+                                                    isLoading = false
+                                                }
+                                            }
+                                        }
+                                    },
+                                    enabled = !isLoading
+                                ) {
+                                    Icon(Icons.Default.Send, null)
                                 }
-                            ) {
-                                Icon(Icons.Default.Send, null)
                             }
                         }
                     )
